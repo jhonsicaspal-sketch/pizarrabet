@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Pizarra Bet | La estadística respalda, la pelota decide</title>
+    <style>
+        :root {
+            --bg-dark: #07090e;
+            --card-bg: #111622;
+            --card-border: #1e2638;
+            --neon-green: #00ff88;
+            --neon-blue: #00d9ff;
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 2px solid var(--card-border);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-green);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+            background-color: #000;
+            flex-shrink: 0;
+        }
+
+        .logo-circle img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+        }
+
+        .brand-text h1 {
+            font-size: 18px;
+            color: var(--neon-green);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+        }
+
+        .brand-text p {
+            font-size: 10px;
+            color: var(--neon-blue);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .main-layout {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+            width: 100%;
+        }
+
+        /* SIDEBAR / ESCRITORIO */
+        .sidebar {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            font-size: 14px;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 8px;
+        }
+
+        .result-card-mini {
+            background-color: #0b0f17;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .result-teams {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .result-score {
+            color: var(--neon-green);
+            font-size: 12px;
+        }
+
+        /* ACORDEÓN MÓVIL (RESULTADOS ANTERIORES) */
+        .mobile-accordion {
+            display: none;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            width: 100%;
+            background-color: #161f33;
+            color: var(--neon-blue);
+            padding: 14px 18px;
+            text-align: left;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 15px;
+            background-color: var(--card-bg);
+        }
+
+        .accordion-content.active {
+            max-height: 450px;
+            padding: 15px;
+        }
+
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .hook-box {
+            background: linear-gradient(135deg, #111622 0%, #152238 100%);
+            border: 2px solid var(--neon-blue);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+        }
+
+        .hook-box h2 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .hook-box h2 span {
+            color: var(--neon-green);
+        }
+
+        .hook-box p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .telegram-btn {
+            display: inline-block;
+            background-color: var(--neon-green);
+            color: #000;
+            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            margin-top: 15px;
+            text-transform: uppercase;
+            font-size: 13px;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            transition: transform 0.2s;
+        }
+
+        .telegram-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .picks-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .pick-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            transition: border-color 0.2s;
+        }
+
+        .pick-card:hover {
+            border-color: var(--neon-green);
+        }
+
+        .match-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .match-teams {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .pick-prediction {
+            background-color: rgba(0, 255, 136, 0.1);
+            border: 1px dashed var(--neon-green);
+            padding: 6px 12px;
+            border-radius: 8px;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .pick-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .pick-value {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        .odd-container {
+            text-align: center;
+            min-width: 70px;
+        }
+
+        .odd-sublabel {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .odd-badge {
+            background-color: var(--neon-blue);
+            color: #000;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+            display: inline-block;
+        }
+
+        .disclaimer-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-left: 4px solid var(--neon-blue);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .disclaimer-box strong {
+            color: var(--text-main);
+        }
+
+        /* ADAPTACIÓN MÓVIL (RESPONSIVE) */
+        @media (max-width: 900px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                margin: 15px auto;
+                padding: 0 10px;
+            }
+            .sidebar {
+                display: none;
+            }
+            .mobile-accordion {
+                display: block;
+            }
+            .pick-card {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .pick-prediction {
+                width: 100%;
+            }
+            .odd-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background-color: #0b0f17;
+                padding: 8px 12px;
+                border-radius: 8px;
+            }
+            .odd-badge {
+                display: inline-block;
+            }
+        div[id*="netlify"], iframe[src*="netlify"], a[href*="netlify.com/trust"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo-circle">
+                <img src="logopb.png" alt="La Pizarra Bet Logo">
+            </div>
+            <div class="brand-text">
+                <h1>PizarraBet</h1>
+                <p>La estadística respalda, la pelota decide</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        
+        <!-- COLUMNA IZQUIERDA: RESULTADOS ANTERIORES (Solo PC) -->
+        <aside class="sidebar">
+            <h3>Resultados Ayer</h3>
+            
+            <div class="result-card-mini">
+                <div class="result-teams">
+                    <span>Bayer Leverkusen</span>
+                    <span class="result-score">4 - 0</span>
+                </div>
+                <div class="match-meta">Acertado ✅</div>
+            </div>
+
+            <div class="result-card-mini">
+                <div class="result-teams">
+                    <span>Hoffenheim vs B. Dortmund</span>
+                    <span class="result-score">2 - 3</span>
+                </div>
+                <div class="match-meta">Acertado ✅</div>
+            </div>
+
+            <div class="result-card-mini">
+                <div class="result-teams">
+                    <span>M. City vs Coventry</span>
+                    <span class="result-score">1 - 0</span>
+                </div>
+                <div class="match-meta">No acertado ❌</div>
+            </div>
+
+            <div class="result-card-mini">
+                <div class="result-teams">
+                    <span>Sporting vs Nacional</span>
+                    <span class="result-score">2 - 0</span>
+                </div>
+                <div class="match-meta">Acertado ✅</div>
+            </div>
+
+            <div class="result-card-mini">
+                <div class="result-teams">
+                    <span>Marítimo vs Benfica</span>
+                    <span class="result-score">0 - 3</span>
+                </div>
+                <div class="match-meta">Acertado ✅</div>
+            </div>
+        </aside>
+
+        <!-- COLUMNA CENTRAL -->
+        <main class="content-area">
+            
+            <!-- ACORDEÓN DESPLEGABLE DE RESULTADOS (Solo Móvil) -->
+            <div class="mobile-accordion">
+                <button class="accordion-header" id="accordionBtn">
+                    <span>📊 Resultados Ayer</span>
+                    <span>▼</span>
+                </button>
+                <div class="accordion-content" id="accordionContent">
+                    <div class="result-card-mini">
+                        <div class="result-teams">
+                            <span>Bayer Leverkusen</span>
+                            <span class="result-score">4 - 0</span>
+                        </div>
+                        <div class="match-meta">Acertado ✅</div>
+                    </div>
+                    <div class="result-card-mini">
+                        <div class="result-teams">
+                            <span>Hoffenheim vs B. Dortmund</span>
+                            <span class="result-score">2 - 3</span>
+                        </div>
+                        <div class="match-meta">Acertado ✅</div>
+                    </div>
+                    <div class="result-card-mini">
+                        <div class="result-teams">
+                            <span>M. City vs Coventry</span>
+                            <span class="result-score">1 - 0</span>
+                        </div>
+                        <div class="match-meta">No acertado ❌</div>
+                    </div>
+                    <div class="result-card-mini">
+                        <div class="result-teams">
+                            <span>Sporting vs Nacional</span>
+                            <span class="result-score">2 - 0</span>
+                        </div>
+                        <div class="match-meta">Acertado ✅</div>
+                    </div>
+                    <div class="result-card-mini">
+                        <div class="result-teams">
+                            <span>Marítimo vs Benfica</span>
+                            <span class="result-score">0 - 3</span>
+                        </div>
+                        <div class="match-meta">Acertado ✅</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECUADRO GANCHO TELEGRAM -->
+            <div class="hook-box">
+                <h2>🔥 CUOTA DEL DÍA: <span>2.07 RECOMENDADA</span></h2>
+                <p>No te pierdas el análisis detallado y nuestra combinada fuerte del fin de semana.</p>
+                <a href="https://t.me/PizarraBetOficial" target="_blank" class="telegram-btn">Unirme al Canal de Telegram</a>
+            </div>
+
+            <!-- LAS 5 TARJETAS DE PICKS -->
+            <div class="picks-grid">
+                
+                <!-- Tarjeta 1 -->
+                <div class="pick-card">
+                    <div>
+                        <div class="match-meta">📅 Hoy • Bundesliga</div>
+                        <div class="match-teams">Eintracht Fráncfort vs Augsburgo</div>
+                    </div>
+                    <div class="pick-prediction">
+                        <span class="pick-label">Pick Sugerido</span>
+                        <span class="pick-value">+1.5 Goles Totales</span>
+                    </div>
+                    <div class="odd-container">
+                        <span class="odd-sublabel">Cta. Aprox</span>
+                        <div class="odd-badge">1.35</div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div class="pick-card">
+                    <div>
+                        <div class="match-meta">📅 Hoy • LaLiga</div>
+                        <div class="match-teams">Valencia vs Barcelona</div>
+                    </div>
+                    <div class="pick-prediction">
+                        <span class="pick-label">Pick Sugerido</span>
+                        <span class="pick-value">2G + Over 2.5 Goles Totales</span>
+                    </div>
+                    <div class="odd-container">
+                        <span class="odd-sublabel">Cta. Aprox</span>
+                        <div class="odd-badge">1.72</div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div class="pick-card">
+                    <div>
+                        <div class="match-meta">📅 Hoy • Premier League</div>
+                        <div class="match-teams">Arsenal vs Chelsea</div>
+                    </div>
+                    <div class="pick-prediction">
+                        <span class="pick-label">Pick Sugerido</span>
+                        <span class="pick-value">1X + 1.5 Goles Totales</span>
+                    </div>
+                    <div class="odd-container">
+                        <span class="odd-sublabel">Cta. Aprox</span>
+                        <div class="odd-badge">1.47</div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 4 -->
+                <div class="pick-card">
+                    <div>
+                        <div class="match-meta">📅 Hoy • Eliteserien</div>
+                        <div class="match-teams">Molde vs KFUM Oslo</div>
+                    </div>
+                    <div class="pick-prediction">
+                        <span class="pick-label">Pick Sugerido</span>
+                        <span class="pick-value">Gana Local (1G)</span>
+                    </div>
+                    <div class="odd-container">
+                        <span class="odd-sublabel">Cta. Aprox</span>
+                        <div class="odd-badge">1.33</div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 5 -->
+                <div class="pick-card">
+                    <div>
+                        <div class="match-meta">📅 Hoy • Brasileirão</div>
+                        <div class="match-teams">Corinthians vs Chapecoense</div>
+                    </div>
+                    <div class="pick-prediction">
+                        <span class="pick-label">Pick Sugerido</span>
+                        <span class="pick-value">1X + 1.5 Goles Totales</span>
+                    </div>
+                    <div class="odd-container">
+                        <span class="odd-sublabel">Cta. Aprox</span>
+                        <div class="odd-badge">1.50</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TEXTO DE GESTIÓN Y RESPONSABILIDAD -->
+            <div class="disclaimer-box">
+                <strong>Aviso de Gestión y Responsabilidad:</strong> El contenido de esta plataforma está dirigido exclusivamente a mayores de edad. Recomendamos armar selecciones de máximo 2 a 3 líneas y destinar estrictamente entre el <strong>2% y 3% de tu capital por jugada</strong>. La estadística respalda, la pelota decide con responsabilidad.
+            </div>
+
+        </main>
+    </div>
+
+    <!-- SCRIPT PARA EL ACORDEÓN MÓVIL -->
+    <script>
+        const btn = document.getElementById('accordionBtn');
+        const content = document.getElementById('accordionContent');
+        
+        btn.addEventListener('click', function() {
+            content.classList.toggle('active');
+            if (content.classList.contains('active')) {
+                btn.querySelector('span:last-child').textContent = '▲';
+            } else {
+                btn.querySelector('span:last-child').textContent = '▼';
+            }
+        });
+    </script>
+
+</body>
+</html>
