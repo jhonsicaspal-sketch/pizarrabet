@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Respaldos Estadísticos | La Pizarra Bet</title>
+    <style>
+        :root {
+            --bg-dark: #07090e;
+            --card-bg: #111622;
+            --card-border: #1e2638;
+            --neon-green: #00ff88;
+            --neon-blue: #00d9ff;
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 2px solid var(--card-border);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-green);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+        }
+
+        .logo-circle img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+        }
+
+        .brand-text h1 {
+            font-size: 16px;
+            color: var(--neon-green);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 30px auto;
+            padding: 0 20px;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--neon-blue);
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* RECUADRO SUPERIOR CUOTA COMBINADA */
+        .cuota-banner-box {
+            background: linear-gradient(135deg, #111622 0%, #152238 100%);
+            border: 2px solid var(--neon-green);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .cuota-banner-box h2 {
+            font-size: 18px;
+            color: var(--text-main);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .cuota-banner-box h2 span {
+            color: var(--neon-green);
+        }
+
+        .cuota-banner-box p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        h2.section-title {
+            color: var(--neon-blue);
+            font-size: 22px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .blog-post {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .blog-post h3 {
+            color: var(--neon-green);
+            font-size: 17px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 8px;
+        }
+
+        .meta-tags {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            background: #0b0f17;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .blog-post h4 {
+            color: var(--text-main);
+            font-size: 14px;
+            margin: 15px 0 8px 0;
+            text-transform: uppercase;
+        }
+
+        .blog-post p {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .blog-post strong {
+            color: var(--text-main);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--card-border);
+            background-color: var(--card-bg);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo-container">
+            <div class="logo-circle">
+                <img src="logopb.png" alt="La Pizarra Bet Logo">
+            </div>
+            <div class="brand-text">
+                <h1>PizarraBet</h1>
+            </div>
+        </a>
+    </header>
+
+    <div class="container">
+        <a href="index.html" class="back-link">← Volver a los Picks del Día</a>
+        
+        <!-- RECUADRO CUOTA COMBINADA -->
+        <div class="cuota-banner-box">
+            <h2>🔥 CUOTA COMBINADA DESTACADA: <span>@ 2.03</span></h2>
+            <p>Análisis técnico y justificación estadística detallada de las selecciones principales.</p>
+        </div>
+
+        <h2 class="section-title">Respaldos Estadísticos Oficiales</h2>
+        <p class="subtitle">Métricas rigurosas, comportamientos a domicilio y rendimiento histórico de nuestros picks.</p>
+
+        <!-- Artículo 1: Oporto vs Manchester City -->
+        <article class="blog-post">
+            <h3>Encuentro: Oporto vs. Manchester City</h3>
+            <div class="meta-tags">
+                <span>🎯 Pick: X2 (City o Empate) + Menos de 4.5 Goles</span>
+                <span>📊 Probabilidad: 82.5%</span>
+                <span>⭐ Confianza: 9.2 / 10</span>
+                <span>📈 Cuota: @ 1.42</span>
+            </div>
+
+            <h4>Datos Fríos y Justificación de la Línea</h4>
+            <p><strong>Solidez del invicto visitante (X2):</strong> El Manchester City registra un 90% de efectividad sin conocer la derrota en sus últimas 10 salidas oficiales a domicilio (6 victorias y 3 empates), respaldado por un dominio histórico absoluto en el H2H donde nunca ha perdido ante el Oporto (2 victorias y 2 empates).</p>
+            <p><strong>Control estricto de la línea de goles (-4.5):</strong> El 100% de los últimos 10 partidos oficiales del Oporto como local se mantuvieron por debajo de la línea de 4.5 goles (con un promedio defensivo inquebrantable de solo 3 goles en contra en ese tramo), garantizando un margen de seguridad absoluto frente a marcadores abultados.</p>
+            <p><strong>Ausencia de excesos ofensivos en contra:</strong> Ninguno de los últimos 10 partidos a domicilio del Manchester City ni de las localías del Oporto rebasó el umbral de los 4.5 tantos globales, eliminando la volatilidad de partidos desbocados y asegurando la estabilidad de la cuota combinada.</p>
+            <p><strong>Respaldo estadístico conjunto:</strong> Al cruzar el 90% de invicto del City fuera de casa con el 100% de control en el umbral inferior de goles del Oporto en Do Dragão, la probabilidad matemática real de esta combinación se consolida de forma sólida en el 82.5%.</p>
+
+            <h4>Datos Fríos y Resumen Comparativo</h4>
+            <p><strong>Efectividad de invicto en duelos directos:</strong> El historial de enfrentamientos oficiales (H2H) muestra que el Oporto posee un 0% de victorias frente al Manchester City en competiciones europeas, avalando de manera categórica la doble oportunidad visitante (X2). <em>(Dato frío)</em></p>
+            <p><strong>Blindaje defensivo en casa:</strong> El análisis comparativo de los últimos 10 duelos del Oporto en su estadio revela un promedio de apenas 0.3 goles en contra por partido (3 goles encajados en 10 juegos), reflejando una muralla defensiva muy difícil de superar por cualquier rival. <em>(Dato frío)</em></p>
+            <p><strong>Sequía histórica de cara al gol:</strong> El Oporto acumula una racha negativa histórica donde solo ha sido capaz de anotarle 1 gol en los últimos 4 partidos oficiales disputados directamente frente al Manchester City, afianzando la tendencia a un encuentro de pocas concesiones en el marcador. <em>(Dato curioso)</em></p>
+        </article>
+
+        <!-- Artículo 2: Oporto vs Inter de Milán -->
+        <article class="blog-post">
+            <h3>Encuentro: Oporto vs. Inter de Milán</h3>
+            <div class="meta-tags">
+                <span>🎯 Pick: Multigol 1-3 goles del Inter (Visitante)</span>
+                <span>📊 Probabilidad: 90.0%</span>
+                <span>⭐ Confianza: 9.5 / 10</span>
+                <span>📈 Cuota: @ 1.43</span>
+            </div>
+
+            <h4>Datos Fríos y Justificación de la Línea</h4>
+            <p><strong>Alta efectividad en el rango de 1 a 3 goles:</strong> El Inter registra un 90% de cumplimiento exacto en este rango durante sus últimos 10 partidos oficiales como visitante, anotando dentro de los parámetros establecidos en 9 de esos 10 encuentros.</p>
+            <p><strong>Consistencia ofensiva a domicilio:</strong> El conjunto italiano perforó la red rival en el 100% de sus últimas 10 salidas oficiales, garantizando que no se queda en cero en condición de visitante.</p>
+            <p><strong>Control de umbrales máximos:</strong> Solo en 1 de sus 10 desplazamientos recientes el Inter superó la barrera de los 3 goles propios (anotando 4 tantos ante el Como), lo que mantiene una estabilidad predecible en la franja de 1 a 3 anotaciones.</p>
+            <p><strong>Respaldo estadístico conjunto:</strong> Al cruzar la inercia anotadora del Inter a domicilio con la contención de su cuota goleadora por debajo de los 4 tantos, la probabilidad matemática real de este rango se consolida firmemente en el 90.0%.</p>
+
+            <h4>Datos Fríos y Resumen Comparativo</h4>
+            <p><strong>Desglose de aciertos del rango:</strong> El análisis cuantitativo de sus últimas 10 salidas refleja goles exactos dentro del rango en los duelos ante Cagliari (1), Juventus (2), AC Milan (1), Manchester City (1), Karlsruher (2), Bolonia (3), Lazio en copa (2), Lazio en liga (3) y Torino (2). <em>(Dato frío)</em></p>
+            <p><strong>Margen de exclusión de la alta:</strong> El único encuentro que rompió la regla del rango de 1 a 3 goles fue su visita al Como con un registro de 4 tantos, representando apenas un 10% de desviación estadística en la muestra global. <em>(Dato frío)</em></p>
+            <p><strong>Inercia visitante inquebrantable:</strong> La racha del Inter a domicilio demuestra que su aparato ofensivo siempre produce al menos una anotación sin caer en excesos descontrolados de 4 o más goles propios en la gran mayoría de sus presentaciones fuera de casa. <em>(Dato curioso)</em></p>
+        </article>
+
+    </div>
+
+    <footer>
+        <p>La Pizarra Bet © 2026 — La estadística respalda, la pelota decide.</p>
+    </footer>
+
+</body>
+</html>
