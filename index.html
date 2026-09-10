@@ -179,7 +179,6 @@
             text-transform: uppercase;
         }
 
-        /* BOTÓN DE RETORNO ABAJO (ESTILO ELEGANTE DORADO) */
         .back-to-feed-btn-bottom {
             background-color: rgba(255, 183, 0, 0.15);
             border: 1px solid var(--neon-gold);
@@ -197,7 +196,7 @@
             background-color: rgba(255, 183, 0, 0.25);
         }
 
-        /* TARJETAS VIP (ESTILO DORADO/ÁMBAR EXCLUSIVO) */
+        /* TARJETAS VIP */
         .pick-card-vip {
             background-color: var(--card-bg);
             border: 1px solid #3a2e0c;
@@ -206,10 +205,11 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            transition: border-color 0.2s;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .pick-card-vip:hover {
+        .pick-card-vip.unlocked-pulse {
             border-color: var(--neon-gold);
+            box-shadow: 0 0 15px rgba(255, 183, 0, 0.4);
         }
 
         .unlock-action-vip {
@@ -243,6 +243,7 @@
             margin-top: 4px;
             flex-direction: column;
             gap: 6px;
+            animation: fadeInContent 0.4s ease-in-out;
         }
         .unlocked-content-vip.show {
             display: flex;
@@ -302,6 +303,11 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .pick-card.unlocked-pulse {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
         }
 
         .pick-header {
@@ -362,9 +368,15 @@
             margin-top: 4px;
             flex-direction: column;
             gap: 6px;
+            animation: fadeInContent 0.4s ease-in-out;
         }
         .unlocked-content.show {
             display: flex;
+        }
+
+        @keyframes fadeInContent {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .pick-result-text {
@@ -428,7 +440,7 @@
                 <p>La estadística respalda</p>
             </div>
         </div>
-        <div class="user-credits">
+        <div class="user-credits" id="userCreditsDisplay">
             💎 10 Cr.
         </div>
     </header>
@@ -457,7 +469,7 @@
                             <span class="match-meta">📅 Hoy • Prob. 88%</span>
                             <span class="match-teams">Wrexham vs [Rival]</span>
                         </div>
-                        <div class="unlock-action" onclick="unlockPick(1)">
+                        <div class="unlock-action" onclick="unlockPick(1, 1)">
                             <span class="odd-hint">Cta: 1.35</span>
                             <span class="credit-cost">💎 1 Cr.</span>
                         </div>
@@ -481,7 +493,7 @@
                             <span class="match-meta">📅 Hoy • Prob. 85%</span>
                             <span class="match-teams">Real Madrid vs [Rival]</span>
                         </div>
-                        <div class="unlock-action" onclick="unlockPick(2)">
+                        <div class="unlock-action" onclick="unlockPick(2, 1)">
                             <span class="odd-hint">Cta: 1.40</span>
                             <span class="credit-cost">💎 1 Cr.</span>
                         </div>
@@ -523,7 +535,7 @@
                             <span class="match-meta" style="color: var(--neon-gold);">⭐ Alta Gama • Prob. 82%</span>
                             <span class="match-teams">Bayern vs Dortmund</span>
                         </div>
-                        <div class="unlock-action-vip" onclick="unlockVip(1)">
+                        <div class="unlock-action-vip" onclick="unlockVip(1, 4)">
                             <span class="odd-hint" style="color: #bfa143;">Cta: 2.10</span>
                             <span class="credit-cost-vip">💎 4 Cr.</span>
                         </div>
@@ -548,7 +560,7 @@
                             <span class="match-meta" style="color: var(--neon-gold);">⭐ Alta Gama • Prob. 79%</span>
                             <span class="match-teams">Napoli vs Inter</span>
                         </div>
-                        <div class="unlock-action-vip" onclick="unlockVip(2)">
+                        <div class="unlock-action-vip" onclick="unlockVip(2, 3)">
                             <span class="odd-hint" style="color: #bfa143;">Cta: 1.95</span>
                             <span class="credit-cost-vip">💎 3 Cr.</span>
                         </div>
@@ -568,7 +580,7 @@
 
             </div>
 
-            <!-- BOTÓN DE RETORNO AL FEED (UBICADO ABAJO DE LOS PICKS VIP) -->
+            <!-- BOTÓN DE RETORNO AL FEED -->
             <div class="back-to-feed-btn-bottom" onclick="switchToGeneral()">
                 ← Volver al Feed General
             </div>
@@ -582,6 +594,12 @@
     </div>
 
     <script>
+        let currentCredits = 10;
+
+        function updateCreditsUI() {
+            document.getElementById('userCreditsDisplay').innerText = `💎 ${currentCredits} Cr.`;
+        }
+
         function switchToVip() {
             document.getElementById('generalView').style.display = 'none';
             document.getElementById('vipView').style.display = 'flex';
@@ -594,8 +612,16 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function unlockPick(id) {
+        function unlockPick(id, cost) {
+            if (currentCredits < cost) {
+                alert("¡No tienes suficientes créditos! Recarga más para desbloquear este pick.");
+                return;
+            }
+            currentCredits -= cost;
+            updateCreditsUI();
+
             const card = document.getElementById('card-' + id);
+            card.classList.add('unlocked-pulse');
             card.querySelector('.unlock-action').style.display = 'none';
             document.getElementById('content-' + id).classList.add('show');
         }
@@ -604,8 +630,16 @@
             document.getElementById('stats-' + id).classList.toggle('show');
         }
 
-        function unlockVip(id) {
+        function unlockVip(id, cost) {
+            if (currentCredits < cost) {
+                alert("¡No tienes suficientes créditos VIP! Recarga saldo para acceder a esta joya.");
+                return;
+            }
+            currentCredits -= cost;
+            updateCreditsUI();
+
             const card = document.getElementById('vip-card-' + id);
+            card.classList.add('unlocked-pulse');
             card.querySelector('.unlock-action-vip').style.display = 'none';
             document.getElementById('vip-content-' + id).classList.add('show');
         }
