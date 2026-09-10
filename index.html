@@ -12,6 +12,7 @@
             --neon-green: #00ff88;
             --neon-blue: #00d9ff;
             --neon-gold: #ffb700;
+            --neon-red: #ff3366;
             --text-main: #ffffff;
             --text-muted: #8b9bb4;
         }
@@ -82,6 +83,12 @@
             text-transform: uppercase;
         }
 
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .user-credits {
             background-color: #161f33;
             border: 1px solid var(--neon-green);
@@ -91,6 +98,22 @@
             font-weight: bold;
             color: var(--neon-green);
             box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+        }
+
+        .admin-toggle-btn {
+            background-color: rgba(0, 217, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .admin-toggle-btn:hover {
+            background-color: rgba(0, 217, 255, 0.2);
+            box-shadow: 0 0 8px rgba(0, 217, 255, 0.3);
         }
 
         .main-layout {
@@ -157,7 +180,7 @@
             font-weight: bold;
         }
 
-        /* VISTA VIP EXCLUSIVA (OCULTA POR DEFECTO) */
+        /* VISTA VIP EXCLUSIVA */
         #vipView {
             display: none;
             flex-direction: column;
@@ -196,7 +219,100 @@
             background-color: rgba(255, 183, 0, 0.25);
         }
 
-        /* TARJETAS VIP */
+        /* VISTA PANEL DE CONTROL (ADMIN) */
+        #adminView {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .admin-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--neon-blue);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.15);
+        }
+
+        .admin-title {
+            font-size: 16px;
+            color: var(--neon-blue);
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .form-control {
+            background-color: #07090e;
+            border: 1px solid var(--card-border);
+            padding: 10px;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 13px;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn-publish {
+            background: linear-gradient(135deg, #00d9ff 0%, #0088ff 100%);
+            color: #000;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
+            transition: opacity 0.2s;
+        }
+        .btn-publish:hover {
+            opacity: 0.9;
+        }
+
+        .btn-danger-reset {
+            background-color: rgba(255, 51, 102, 0.15);
+            border: 1px solid var(--neon-red);
+            color: var(--neon-red);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        /* TARJETAS VIP Y GENERALES */
         .pick-card-vip {
             background-color: var(--card-bg);
             border: 1px solid #3a2e0c;
@@ -282,7 +398,6 @@
             display: block;
         }
 
-        /* GRID DE PICKS GENERALES */
         #generalView {
             display: flex;
             flex-direction: column;
@@ -431,7 +546,7 @@
 <body>
 
     <header>
-        <div class="logo-container">
+        <div class="logo-container" style="cursor: pointer;" onclick="switchView('general')">
             <div class="logo-circle">
                 <img src="logopb.png" alt="La Pizarra Bet Logo">
             </div>
@@ -440,8 +555,11 @@
                 <p>La estadística respalda</p>
             </div>
         </div>
-        <div class="user-credits" id="userCreditsDisplay">
-            💎 10 Cr.
+        <div class="header-controls">
+            <button class="admin-toggle-btn" id="adminToggleBtn" onclick="toggleAdminView()">⚙️ Panel Admin</button>
+            <div class="user-credits" id="userCreditsDisplay">
+                💎 10 Cr.
+            </div>
         </div>
     </header>
 
@@ -451,7 +569,7 @@
         <div id="generalView">
             
             <!-- BANNER ANUNCIADOR VIP -->
-            <div class="vip-banner-box" onclick="switchToVip()">
+            <div class="vip-banner-box" onclick="switchView('vip')">
                 <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
                 <h2>PRONÓSTICOS VIP: <span>CUOTAS 1.85+</span></h2>
                 <p>Entra aquí para ver selecciones protegidas de alto valor analítico.</p>
@@ -460,84 +578,9 @@
                 </div>
             </div>
 
-            <!-- LISTA DE PICKS GENERALES -->
-            <div class="picks-grid">
-                
-                <!-- Pick de 1 Crédito -->
-                <div class="pick-card" id="card-1">
-                    <div class="pick-header">
-                        <div class="match-info">
-                            <span class="match-meta">📅 Hoy • Prob. 88%</span>
-                            <span class="match-teams">Wrexham vs [Rival]</span>
-                        </div>
-                        <div class="unlock-action" onclick="unlockPick(1, 1)">
-                            <span class="odd-hint">Cta: 1.35</span>
-                            <span class="credit-cost">💎 1 Cr.</span>
-                        </div>
-                    </div>
-                    <div class="unlocked-content" id="content-1">
-                        <div class="pick-result-text">
-                            <span>🎯 Pick: Wrexham o Empate (Doble Oportunidad)</span>
-                        </div>
-                        <button class="stats-accordion-btn" onclick="toggleStats(1)">
-                            <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                        </button>
-                        <div class="stats-details" id="stats-1">
-                            Control absoluto de localía con 91% de partidos sumando puntos en los últimos meses.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pick de 2 Créditos -->
-                <div class="pick-card" id="card-2">
-                    <div class="pick-header">
-                        <div class="match-info">
-                            <span class="match-meta">📅 Hoy • Prob. 85%</span>
-                            <span class="match-teams">Real Madrid vs [Rival]</span>
-                        </div>
-                        <div class="unlock-action" onclick="unlockPick(2, 2)">
-                            <span class="odd-hint">Cta: 1.40</span>
-                            <span class="credit-cost">💎 2 Cr.</span>
-                        </div>
-                    </div>
-                    <div class="unlocked-content" id="content-2">
-                        <div class="pick-result-text">
-                            <span>🎯 Pick: Más de 1.5 Goles en el partido</span>
-                        </div>
-                        <button class="stats-accordion-btn" onclick="toggleStats(2)">
-                            <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                        </button>
-                        <div class="stats-details" id="stats-2">
-                            Cumple la línea de 1.5 goles en el 92% de sus encuentros oficiales como local.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Megapick de 20 Créditos -->
-                <div class="pick-card" id="card-20">
-                    <div class="pick-header">
-                        <div class="match-info">
-                            <span class="match-meta" style="color: var(--neon-blue);">🔥 Megapick Combinado • Prob. 94%</span>
-                            <span class="match-teams">Parley Especial de Fin de Semana</span>
-                        </div>
-                        <div class="unlock-action" onclick="unlockPick(20, 20)">
-                            <span class="odd-hint">Cta: 4.50</span>
-                            <span class="credit-cost" style="color: var(--neon-blue);">💎 20 Cr.</span>
-                        </div>
-                    </div>
-                    <div class="unlocked-content" id="content-20">
-                        <div class="pick-result-text">
-                            <span>🎯 Pick: Triangulación de victorias locales + Under 3.5 global</span>
-                        </div>
-                        <button class="stats-accordion-btn" onclick="toggleStats(20)">
-                            <span>📊 Ver respaldo estadístico masivo</span> <span>▼</span>
-                        </button>
-                        <div class="stats-details" id="stats-20">
-                            Análisis cruzado de 50 partidos históricos con métricas de rendimiento físico y posesión del balón superior al 65%.
-                        </div>
-                    </div>
-                </div>
-
+            <!-- CONTENEDOR DINÁMICO DE PICKS GENERALES -->
+            <div class="picks-grid" id="generalPicksContainer">
+                <!-- Se inyectan por JS -->
             </div>
 
             <div class="disclaimer-box">
@@ -553,62 +596,12 @@
                 <span class="vip-view-title">👑 Pronósticos VIP de Élite</span>
             </div>
 
-            <div class="picks-grid">
-                
-                <!-- Pick VIP 1 (4 Créditos) -->
-                <div class="pick-card-vip" id="vip-card-1">
-                    <div class="pick-header">
-                        <div class="match-info">
-                            <span class="match-meta" style="color: var(--neon-gold);">⭐ Alta Gama • Prob. 82%</span>
-                            <span class="match-teams">Bayern vs Dortmund</span>
-                        </div>
-                        <div class="unlock-action-vip" onclick="unlockVip(1, 4)">
-                            <span class="odd-hint" style="color: #bfa143;">Cta: 2.10</span>
-                            <span class="credit-cost-vip">💎 4 Cr.</span>
-                        </div>
-                    </div>
-                    <div class="unlocked-content-vip" id="vip-content-1">
-                        <div class="pick-result-text-vip">
-                            <span>🎯 Pick VIP: Ambos anotan + Más de 2.5 Goles</span>
-                        </div>
-                        <button class="stats-accordion-btn-vip" onclick="toggleVipStats(1)">
-                            <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
-                        </button>
-                        <div class="stats-details-vip" id="vip-stats-1">
-                            Los clásicos recientes promedian 3.8 goles por partido con una tendencia del 95% en BTTS.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pick VIP 2 (3 Créditos) -->
-                <div class="pick-card-vip" id="vip-card-2">
-                    <div class="pick-header">
-                        <div class="match-info">
-                            <span class="match-meta" style="color: var(--neon-gold);">⭐ Alta Gama • Prob. 79%</span>
-                            <span class="match-teams">Napoli vs Inter</span>
-                        </div>
-                        <div class="unlock-action-vip" onclick="unlockVip(2, 3)">
-                            <span class="odd-hint" style="color: #bfa143;">Cta: 1.95</span>
-                            <span class="credit-cost-vip">💎 3 Cr.</span>
-                        </div>
-                    </div>
-                    <div class="unlocked-content-vip" id="vip-content-2">
-                        <div class="pick-result-text-vip">
-                            <span>🎯 Pick VIP: Inter o Empate + Menos de 3.5 Goles</span>
-                        </div>
-                        <button class="stats-accordion-btn-vip" onclick="toggleVipStats(2)">
-                            <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
-                        </button>
-                        <div class="stats-details-vip" id="vip-stats-2">
-                            Solidez táctica defensiva en duelos directos por la punta del campeonato.
-                        </div>
-                    </div>
-                </div>
-
+            <!-- CONTENEDOR DINÁMICO DE PICKS VIP -->
+            <div class="picks-grid" id="vipPicksContainer">
+                <!-- Se inyectan por JS -->
             </div>
 
-            <!-- BOTÓN DE RETORNO AL FEED -->
-            <div class="back-to-feed-btn-bottom" onclick="switchToGeneral()">
+            <div class="back-to-feed-btn-bottom" onclick="switchView('general')">
                 ← Volver al Feed General
             </div>
 
@@ -618,18 +611,88 @@
 
         </div>
 
+        <!-- VISTA PANEL DE CONTROL (ADMIN) -->
+        <div id="adminView">
+            <div class="admin-card">
+                <div class="admin-title">🛠️ Carga y Gestión de Pronósticos</div>
+                
+                <form id="adminPickForm" onsubmit="handleCreatePick(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Sección destino</label>
+                            <select id="pickSection" class="form-control">
+                                <option value="general">Feed General</option>
+                                <option value="vip">Zona VIP 🌟</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Costo en Créditos (💎)</label>
+                            <input type="number" id="pickCost" class="form-control" min="1" max="100" value="2" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Equipos / Partido</label>
+                            <input type="text" id="pickTeams" class="form-control" placeholder="Ej: Barcelona vs Real Madrid" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Probabilidad (%)</label>
+                            <input type="text" id="pickProb" class="form-control" placeholder="Ej: 88%" value="85%" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cuota (Odd)</label>
+                            <input type="text" id="pickOdd" class="form-control" placeholder="Ej: 1.45" value="1.50" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha / Meta</label>
+                            <input type="text" id="pickMeta" class="form-control" value="📅 Hoy • Análisis Táctico" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pronóstico (Pick exacto)</label>
+                        <input type="text" id="pickResult" class="form-control" placeholder="Ej: Victoria local + Más de 1.5 goles" required>
+                    </div>
+
+                    <!-- AQUÍ ESTÁ LA CASILLA PARA EDITAR Y MONTAR TU TEXTO DE RESPALDO -->
+                    <div class="form-group">
+                        <label>📊 Respaldo Estadístico (Escribe aquí tu análisis detallado)</label>
+                        <textarea id="pickStats" class="form-control" rows="4" placeholder="Escribe aquí las métricas, rachas, xG o datos históricos que respaldan tu pick..." required>📈 Respaldo Táctico: [Escribe aquí tu análisis detallado sobre posesión, xG, rendimiento de local/visitante o rachas recientes de los equipos...]</textarea>
+                    </div>
+
+                    <button type="submit" class="btn-publish">🚀 Publicar Nuevo Pronóstico</button>
+                </form>
+
+                <button class="btn-danger-reset" onclick="resetDefaultPicks()">🔄 Restaurar Picks Iniciales</button>
+            </div>
+
+            <div class="back-to-feed-btn-bottom" onclick="switchView('general')">
+                ← Volver al Feed de Usuario
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // CARGAR DATOS PERSISTENTES O INICIALIZAR EN 10 CRÉDITOS
-        let currentCredits = localStorage.getItem('pb_credits') !== null 
-            ? parseInt(localStorage.getItem('pb_credits')) 
-            : 10; 
+        // DATOS INICIALES DE PRUEBA
+        const defaultPicks = [
+            { id: 'gen-1', section: 'general', teams: 'Wrexham vs [Rival]', prob: '88%', odd: '1.35', cost: 1, meta: '📅 Hoy', result: 'Wrexham o Empate (Doble Oportunidad)', stats: '📈 Respaldo Táctico: Control absoluto de localía con un 91% de efectividad sumando puntos en sus últimos 12 partidos oficiales. Promedio de posesión superior al 58%.' },
+            { id: 'gen-2', section: 'general', teams: 'Real Madrid vs [Rival]', prob: '85%', odd: '1.40', cost: 2, meta: '📅 Hoy', result: 'Más de 1.5 Goles en el partido', stats: '📈 Respaldo Táctico: El equipo local cumple con la línea de 1.5 goles en el 92% de sus partidos disputados en casa esta temporada.' },
+            { id: 'vip-1', section: 'vip', teams: 'Bayern vs Dortmund', prob: '82%', odd: '2.10', cost: 4, meta: '⭐ Alta Gama VIP', result: 'Ambos anotan + Más de 2.5 Goles', stats: '🌟 Respaldo Estadístico Élite: Los duelos directos recientes promedian 3.8 goles por partido con tendencia de BTTS activa en el 85% de sus cruces.' },
+            { id: 'vip-2', section: 'vip', teams: 'Napoli vs Inter', prob: '79%', odd: '1.95', cost: 3, meta: '⭐ Alta Gama VIP', result: 'Inter o Empate + Menos de 3.5 Goles', stats: '🌟 Respaldo Estadístico Élite: Solidez defensiva del visitante registrando el 70% de sus salidas sin encajar más de un tanto.' }
+        ];
 
+        let currentCredits = localStorage.getItem('pb_credits') !== null ? parseInt(localStorage.getItem('pb_credits')) : 10;
         let unlockedPicks = JSON.parse(localStorage.getItem('pb_unlocked')) || {};
+        let allPicks = JSON.parse(localStorage.getItem('pb_all_picks')) || defaultPicks;
 
         window.addEventListener('DOMContentLoaded', () => {
             updateCreditsUI();
+            renderPicks();
             restaurarPicksDesbloqueados();
         });
 
@@ -638,42 +701,124 @@
             localStorage.setItem('pb_credits', currentCredits);
         }
 
-        function switchToVip() {
-            document.getElementById('generalView').style.display = 'none';
-            document.getElementById('vipView').style.display = 'flex';
+        function switchView(viewName) {
+            document.getElementById('generalView').style.display = viewName === 'general' ? 'flex' : 'none';
+            document.getElementById('vipView').style.display = viewName === 'vip' ? 'flex' : 'none';
+            document.getElementById('adminView').style.display = viewName === 'admin' ? 'flex' : 'none';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function switchToGeneral() {
-            document.getElementById('vipView').style.display = 'none';
-            document.getElementById('generalView').style.display = 'flex';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function desbloquearTarjetaVisual(cardId, contentId, isVip = false) {
-            const card = document.getElementById(cardId);
-            card.classList.add('unlocked-pulse');
-            
-            const btn = card.querySelector(isVip ? '.unlock-action-vip' : '.unlock-action');
-            if (btn) btn.style.display = 'none';
-            
-            document.getElementById(contentId).classList.add('show');
-        }
-
-        function restaurarPicksDesbloqueados() {
-            for (let id in unlockedPicks) {
-                if (unlockedPicks[id]) {
-                    if (id.startsWith('vip-')) {
-                        let num = id.replace('vip-', '');
-                        desbloquearTarjetaVisual('vip-card-' + num, 'vip-content-' + num, true);
-                    } else {
-                        desbloquearTarjetaVisual('card-' + id, 'content-' + id, false);
-                    }
-                }
+        function toggleAdminView() {
+            const adminView = document.getElementById('adminView');
+            if (adminView.style.display === 'flex') {
+                switchView('general');
+            } else {
+                switchView('admin');
             }
         }
 
-        // MOTOR DE LÓGICA CONDICIONAL DE BLOQUEO/DESBLOQUEO
+        function renderPicks() {
+            const generalContainer = document.getElementById('generalPicksContainer');
+            const vipContainer = document.getElementById('vipPicksContainer');
+            
+            generalContainer.innerHTML = '';
+            vipContainer.innerHTML = '';
+
+            allPicks.forEach(pick => {
+                if (pick.section === 'general') {
+                    generalContainer.innerHTML += `
+                        <div class="pick-card" id="card-${pick.id}">
+                            <div class="pick-header">
+                                <div class="match-info">
+                                    <span class="match-meta">${pick.meta} • Prob. ${pick.prob}</span>
+                                    <span class="match-teams">${pick.teams}</span>
+                                </div>
+                                <div class="unlock-action" onclick="unlockPick('${pick.id}', ${pick.cost})">
+                                    <span class="odd-hint">Cta: ${pick.odd}</span>
+                                    <span class="credit-cost">💎 ${pick.cost} Cr.</span>
+                                </div>
+                            </div>
+                            <div class="unlocked-content" id="content-${pick.id}">
+                                <div class="pick-result-text">
+                                    <span>🎯 Pick: ${pick.result}</span>
+                                </div>
+                                <button class="stats-accordion-btn" onclick="toggleStats('${pick.id}')">
+                                    <span>📊 Ver respaldo estadístico</span> <span>▼</span>
+                                </button>
+                                <div class="stats-details" id="stats-${pick.id}">
+                                    ${pick.stats}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    vipContainer.innerHTML += `
+                        <div class="pick-card-vip" id="card-${pick.id}">
+                            <div class="pick-header">
+                                <div class="match-info">
+                                    <span class="match-meta" style="color: var(--neon-gold);">${pick.meta} • Prob. ${pick.prob}</span>
+                                    <span class="match-teams">${pick.teams}</span>
+                                </div>
+                                <div class="unlock-action-vip" onclick="unlockPick('${pick.id}', ${pick.cost})">
+                                    <span class="odd-hint" style="color: #bfa143;">Cta: ${pick.odd}</span>
+                                    <span class="credit-cost-vip">💎 ${pick.cost} Cr.</span>
+                                </div>
+                            </div>
+                            <div class="unlocked-content-vip" id="content-${pick.id}">
+                                <div class="pick-result-text-vip">
+                                    <span>🎯 Pick VIP: ${pick.result}</span>
+                                </div>
+                                <button class="stats-accordion-btn-vip" onclick="toggleStats('${pick.id}')">
+                                    <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
+                                </button>
+                                <div class="stats-details-vip" id="stats-${pick.id}">
+                                    ${pick.stats}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function handleCreatePick(e) {
+            e.preventDefault();
+
+            const newPick = {
+                id: 'custom-' + Date.now(),
+                section: document.getElementById('pickSection').value,
+                teams: document.getElementById('pickTeams').value,
+                prob: document.getElementById('pickProb').value,
+                odd: document.getElementById('pickOdd').value,
+                cost: parseInt(document.getElementById('pickCost').value),
+                meta: document.getElementById('pickMeta').value,
+                result: document.getElementById('pickResult').value,
+                stats: document.getElementById('pickStats').value // Aquí toma exactamente lo que escribas en la casilla
+            };
+
+            allPicks.unshift(newPick);
+            localStorage.setItem('pb_all_picks', JSON.stringify(allPicks));
+
+            renderPicks();
+            restaurarPicksDesbloqueados();
+            document.getElementById('adminPickForm').reset();
+            
+            alert("¡Pronóstico creado y publicado con éxito con su texto de respaldo!");
+            switchView(newPick.section);
+        }
+
+        function resetDefaultPicks() {
+            if (confirm("¿Estás seguro de restablecer los pronósticos originales? Se borrarán los creados manualmente.")) {
+                allPicks = defaultPicks;
+                localStorage.setItem('pb_all_picks', JSON.stringify(allPicks));
+                localStorage.removeItem('pb_unlocked');
+                unlockedPicks = {};
+                renderPicks();
+                alert("¡Picks restablecidos!");
+                switchView('general');
+            }
+        }
+
         function unlockPick(id, cost) {
             if (currentCredits < cost) {
                 let faltantes = cost - currentCredits;
@@ -687,31 +832,34 @@
             unlockedPicks[id] = true;
             localStorage.setItem('pb_unlocked', JSON.stringify(unlockedPicks));
 
-            desbloquearTarjetaVisual('card-' + id, 'content-' + id, false);
+            desbloquearTarjetaVisual(id);
         }
 
-        function unlockVip(id, cost) {
-            if (currentCredits < cost) {
-                let faltantes = cost - currentCredits;
-                alert(`⚠️ ¡Fondo insuficiente VIP!\n\nEsta joya cuesta 💎 ${cost} Cr. y tu saldo es de 💎 ${currentCredits} Cr.\nTe faltan ${faltantes} créditos para acceder.`);
-                return;
+        function desbloquearTarjetaVisual(id) {
+            const card = document.getElementById('card-' + id);
+            if (!card) return;
+
+            const isVip = card.classList.contains('pick-card-vip');
+            card.classList.add('unlocked-pulse');
+            
+            const btn = card.querySelector(isVip ? '.unlock-action-vip' : '.unlock-action');
+            if (btn) btn.style.display = 'none';
+            
+            const content = document.getElementById('content-' + id);
+            if (content) content.classList.add('show');
+        }
+
+        function restaurarPicksDesbloqueados() {
+            for (let id in unlockedPicks) {
+                if (unlockedPicks[id]) {
+                    desbloquearTarjetaVisual(id);
+                }
             }
-
-            currentCredits -= cost;
-            updateCreditsUI();
-
-            unlockedPicks['vip-' + id] = true;
-            localStorage.setItem('pb_unlocked', JSON.stringify(unlockedPicks));
-
-            desbloquearTarjetaVisual('vip-card-' + id, 'vip-content-' + id, true);
         }
 
         function toggleStats(id) {
-            document.getElementById('stats-' + id).classList.toggle('show');
-        }
-
-        function toggleVipStats(id) {
-            document.getElementById('vip-stats-' + id).classList.toggle('show');
+            const stats = document.getElementById('stats-' + id);
+            if (stats) stats.classList.toggle('show');
         }
     </script>
 
