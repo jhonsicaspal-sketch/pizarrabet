@@ -31,7 +31,7 @@
             flex-direction: column;
         }
 
-        /* PANTALLA DE BLOQUEO / LOGIN INICIAL */
+        /* PANTALLA DE LOGIN INICIAL */
         #loginScreen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -40,26 +40,26 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            padding: 20px;
+            padding: 15px;
         }
 
         .login-card {
             background-color: var(--card-bg);
             border: 2px solid var(--neon-green);
-            padding: 30px;
+            padding: 25px;
             border-radius: 16px;
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
             text-align: center;
         }
 
         .login-logo {
-            width: 70px;
-            height: 70px;
+            width: 65px;
+            height: 65px;
             border-radius: 50%;
             border: 2px solid var(--neon-green);
             margin: 0 auto;
@@ -68,36 +68,39 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            overflow: hidden;
         }
-        .login-logo img { width: 85%; height: 85%; object-fit: contain; }
+        .login-logo img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* APLICACIÓN PRINCIPAL (OCULTA HASTA ENTRAR) */
+        /* APLICACIÓN PRINCIPAL */
         #mainAppContent {
             display: none;
             flex-direction: column;
             min-height: 100vh;
+            width: 100%;
         }
 
         header {
             background-color: var(--card-bg);
             border-bottom: 2px solid var(--card-border);
-            padding: 12px 20px;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            gap: 8px;
         }
 
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             cursor: pointer;
         }
 
         .logo-circle {
-            width: 45px;
-            height: 45px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             border: 2px solid var(--neon-green);
             overflow: hidden;
@@ -109,17 +112,18 @@
             flex-shrink: 0;
         }
 
-        .logo-circle img { width: 90%; height: 90%; object-fit: contain; }
+        .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
 
         .brand-text h1 {
-            font-size: 16px;
+            font-size: 13px;
             color: var(--neon-green);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
         }
 
         .brand-text p {
-            font-size: 9px;
+            font-size: 8px;
             color: var(--neon-blue);
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -128,37 +132,40 @@
         .header-controls {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 6px;
         }
 
         .user-credits {
             background-color: #161f33;
             border: 1px solid var(--neon-green);
-            padding: 6px 12px;
+            padding: 5px 8px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             color: var(--neon-green);
+            white-space: nowrap;
         }
 
         .admin-toggle-btn, .auth-btn {
             background-color: rgba(0, 217, 255, 0.1);
             border: 1px solid var(--neon-blue);
             color: var(--neon-blue);
-            padding: 6px 10px;
+            padding: 5px 8px;
             border-radius: 8px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             cursor: pointer;
+            display: none; /* Oculto por defecto para usuarios normales */
         }
         .auth-btn {
-            background-color: rgba(0, 255, 136, 0.15);
-            border-color: var(--neon-green);
-            color: var(--neon-green);
+            background-color: rgba(255, 77, 77, 0.1);
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+            display: flex;
         }
 
         .main-layout {
-            max-width: 900px;
+            max-width: 700px;
             margin: 15px auto;
             padding: 0 10px;
             display: flex;
@@ -172,7 +179,7 @@
             background: linear-gradient(135deg, #1f1807 0%, #2b2005 100%);
             border: 2px solid var(--neon-gold);
             border-radius: 12px;
-            padding: 16px;
+            padding: 14px;
             text-align: center;
             box-shadow: 0 0 20px rgba(255, 183, 0, 0.25);
             cursor: pointer;
@@ -181,23 +188,23 @@
             display: inline-block;
             background-color: rgba(255, 183, 0, 0.15);
             color: var(--neon-gold);
-            font-size: 9px;
+            font-size: 8px;
             font-weight: bold;
             padding: 3px 8px;
             border-radius: 20px;
             text-transform: uppercase;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             border: 1px solid var(--neon-gold);
         }
-        .vip-banner-box h2 { font-size: 15px; margin-bottom: 4px; color: var(--text-main); }
+        .vip-banner-box h2 { font-size: 14px; margin-bottom: 3px; color: var(--text-main); }
         .vip-banner-box h2 span { color: var(--neon-gold); }
-        .vip-banner-box p { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+        .vip-banner-box p { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
         .vip-action-hint {
             background-color: rgba(255, 183, 0, 0.2);
             border: 1px dashed var(--neon-gold);
-            padding: 8px;
+            padding: 6px;
             border-radius: 8px;
-            font-size: 11px;
+            font-size: 10px;
             color: var(--neon-gold);
             font-weight: bold;
         }
@@ -212,19 +219,19 @@
         .vip-view-header {
             background: linear-gradient(135deg, #2b2005 0%, #1f1807 100%);
             border: 1px solid var(--neon-gold);
-            padding: 12px 15px;
+            padding: 10px 12px;
             border-radius: 10px;
             text-align: center;
         }
-        .vip-view-title { font-size: 15px; font-weight: bold; color: var(--neon-gold); text-transform: uppercase; }
+        .vip-view-title { font-size: 14px; font-weight: bold; color: var(--neon-gold); text-transform: uppercase; }
 
         .back-btn {
             background-color: rgba(255, 183, 0, 0.15);
             border: 1px solid var(--neon-gold);
             color: var(--neon-gold);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
-            padding: 12px;
+            padding: 10px;
             border-radius: 10px;
             cursor: pointer;
             text-align: center;
@@ -235,29 +242,30 @@
             background-color: var(--card-bg);
             border: 1px solid var(--neon-blue);
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
         }
-        .admin-title { font-size: 16px; color: var(--neon-blue); font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
-        .form-group { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
-        .form-group label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
+        .admin-title { font-size: 14px; color: var(--neon-blue); font-weight: bold; margin-bottom: 12px; text-transform: uppercase; }
+        .form-group { margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
         .form-control {
             background-color: #07090e;
             border: 1px solid var(--card-border);
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
             color: var(--text-main);
-            font-size: 13px;
+            font-size: 12px;
+            width: 100%;
         }
-        .form-row { display: flex; gap: 10px; }
-        .form-row .form-group { flex: 1; }
+        .form-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .form-row .form-group { flex: 1; min-width: 130px; }
         .btn-action {
             background: linear-gradient(135deg, #00ff88 0%, #00b359 100%);
             color: #000;
             border: none;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             width: 100%;
             text-transform: uppercase;
@@ -265,42 +273,44 @@
         }
 
         /* TARJETAS DE PRONÓSTICOS */
-        .picks-grid { display: flex; flex-direction: column; gap: 10px; }
+        .picks-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
         .pick-card, .pick-card-vip {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 10px;
-            padding: 12px 15px;
+            padding: 12px;
             display: flex;
             flex-direction: column;
             gap: 8px;
+            width: 100%;
         }
         .pick-card-vip { border-color: #3a2e0c; }
-        .pick-header { display: flex; justify-content: space-between; align-items: center; }
+        .pick-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .match-info { display: flex; flex-direction: column; }
-        .match-meta { font-size: 10px; color: var(--text-muted); }
-        .match-teams { font-size: 14px; font-weight: bold; color: var(--text-main); }
+        .match-meta { font-size: 9px; color: var(--text-muted); }
+        .match-teams { font-size: 13px; font-weight: bold; color: var(--text-main); }
 
         .unlock-action, .unlock-action-vip {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             background-color: #161f33;
             border: 1px solid var(--card-border);
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
             cursor: pointer;
+            flex-shrink: 0;
         }
         .unlock-action-vip { background-color: #211904; border-color: #4a3a0e; }
-        .credit-cost { font-size: 12px; font-weight: bold; color: var(--neon-green); }
-        .credit-cost-vip { font-size: 12px; font-weight: bold; color: var(--neon-gold); }
-        .odd-hint { font-size: 10px; color: var(--text-muted); }
+        .credit-cost { font-size: 11px; font-weight: bold; color: var(--neon-green); }
+        .credit-cost-vip { font-size: 11px; font-weight: bold; color: var(--neon-gold); }
+        .odd-hint { font-size: 9px; color: var(--text-muted); }
 
         .unlocked-content, .unlocked-content-vip {
             display: none;
             background-color: rgba(0, 255, 136, 0.05);
             border: 1px dashed var(--neon-green);
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
             margin-top: 4px;
             flex-direction: column;
@@ -309,15 +319,15 @@
         .unlocked-content-vip { background-color: rgba(255, 183, 0, 0.05); border-color: var(--neon-gold); }
         .unlocked-content.show, .unlocked-content-vip.show { display: flex; }
 
-        .pick-result-text { font-size: 12px; font-weight: bold; color: var(--neon-green); }
-        .pick-result-text-vip { font-size: 12px; font-weight: bold; color: var(--neon-gold); }
+        .pick-result-text { font-size: 11px; font-weight: bold; color: var(--neon-green); }
+        .pick-result-text-vip { font-size: 11px; font-weight: bold; color: var(--neon-gold); }
 
         .stats-accordion-btn, .stats-accordion-btn-vip {
-            background: none; border: none; color: var(--neon-blue); font-size: 11px; cursor: pointer; text-align: left;
+            background: none; border: none; color: var(--neon-blue); font-size: 10px; cursor: pointer; text-align: left; display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 4px 0;
         }
         .stats-accordion-btn-vip { color: #ffcc4d; }
         .stats-details, .stats-details-vip {
-            display: none; font-size: 11px; color: var(--text-muted); background-color: rgba(0, 0, 0, 0.3); padding: 8px; border-radius: 6px; border-left: 2px solid var(--neon-blue); line-height: 1.4;
+            display: none; font-size: 10px; color: var(--text-muted); background-color: rgba(0, 0, 0, 0.3); padding: 8px; border-radius: 6px; border-left: 2px solid var(--neon-blue); line-height: 1.4;
         }
         .stats-details-vip { border-left-color: var(--neon-gold); }
         .stats-details.show, .stats-details-vip.show { display: block; }
@@ -327,8 +337,8 @@
             border: 1px solid var(--card-border);
             border-left: 3px solid var(--neon-blue);
             border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 10px;
+            padding: 10px;
+            font-size: 9px;
             color: var(--text-muted);
             line-height: 1.4;
         }
@@ -336,29 +346,29 @@
 </head>
 <body>
 
-    <!-- 1. PANTALLA DE LOGIN INICIAL (LO PRIMERO QUE SE VE) -->
+    <!-- LOGIN INICIAL -->
     <div id="loginScreen">
         <div class="login-card">
             <div class="login-logo">
                 <img src="logopb.png" alt="Logo">
             </div>
-            <h2 style="color: var(--neon-green); font-size: 18px; text-transform: uppercase;">La Pizarra Bet</h2>
-            <p style="font-size: 11px; color: var(--text-muted);">La estadística respalda, la pelota decide</p>
+            <h2 style="color: var(--neon-green); font-size: 16px; text-transform: uppercase;">La Pizarra Bet</h2>
+            <p style="font-size: 10px; color: var(--text-muted);">La estadística respalda, la pelota decide</p>
             
             <div class="form-group" style="text-align: left; margin-top: 5px;">
                 <label>Correo Electrónico</label>
-                <input type="email" id="loginEmail" class="form-control" placeholder="tucorreo@email.com">
+                <input type="email" id="loginEmail" class="form-control" placeholder="tucorreo@email.com" value="admin@pizarramet.com">
             </div>
             <div class="form-group" style="text-align: left;">
                 <label>Contraseña</label>
-                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••">
+                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" value="123456">
             </div>
             
             <button class="btn-action" onclick="fucLoginSuccess()">🔑 Ingresar al Sistema</button>
         </div>
     </div>
 
-    <!-- 2. APLICACIÓN COMPLETA CON NEONES Y DISEÑO (SE MUESTRA TRAS INGRESAR) -->
+    <!-- APLICACIÓN PRINCIPAL -->
     <div id="mainAppContent">
         <header>
             <div class="logo-container" onclick="switchView('general')">
@@ -371,16 +381,16 @@
                 </div>
             </div>
             <div class="header-controls">
-                <button class="admin-toggle-btn" onclick="switchView('admin')">⚙️ Editor</button>
-                <button class="auth-btn" onclick="location.reload()">Cerrar Sesión</button>
-                <div class="user-credits">💎 10 Cr.</div>
+                <button class="admin-toggle-btn" id="adminNavBtn" onclick="switchView('admin')">⚙️ Editor</button>
+                <div class="user-credits" id="creditDisplay">💎 20 Cr.</div>
+                <button class="auth-btn" onclick="location.reload()">Salir</button>
             </div>
         </header>
 
         <div class="main-layout">
             
             <!-- FEED GENERAL -->
-            <div id="generalView">
+            <div id="generalView" class="picks-grid">
                 <div class="vip-banner-box" onclick="switchView('vip')">
                     <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
                     <h2>PRONÓSTICOS VIP: <span>CUOTAS 1.85+</span></h2>
@@ -388,8 +398,8 @@
                     <div class="vip-action-hint">✨ Acceder a la Zona VIP</div>
                 </div>
 
-                <div class="picks-grid" id="generalPicksContainer">
-                    <!-- Aquí aparecerán tus pronósticos del feed cuando los crees -->
+                <div id="generalPicksContainer" class="picks-grid">
+                    <!-- Las 4 líneas sugeridas se inyectan por JS -->
                 </div>
 
                 <div class="disclaimer-box">
@@ -398,20 +408,20 @@
             </div>
 
             <!-- VISTA VIP -->
-            <div id="vipView">
+            <div id="vipView" class="picks-grid" style="display: none;">
                 <div class="vip-view-header">
                     <span class="vip-view-title">👑 Pronósticos VIP de Élite</span>
                 </div>
 
-                <div class="picks-grid" id="vipPicksContainer">
-                    <!-- Aquí aparecerán tus pronósticos VIP cuando los crees -->
+                <div id="vipPicksContainer" class="picks-grid">
+                    <!-- Los 2 picks VIP se inyectan por JS -->
                 </div>
 
                 <div class="back-btn" onclick="switchView('general')">← Volver al Feed General</div>
             </div>
 
-            <!-- EDITOR (CREAR PRONÓSTICOS) -->
-            <div id="adminView">
+            <!-- EDITOR (SOLO PARA TI) -->
+            <div id="adminView" class="picks-grid" style="display: none;">
                 <div class="admin-card">
                     <div class="admin-title">🛠️ Editor de Pronósticos</div>
                     <form id="adminPickForm" onsubmit="handleCreatePick(event)">
@@ -454,7 +464,7 @@
                         </div>
                         <div class="form-group">
                             <label>Respaldo Estadístico</label>
-                            <textarea id="pickStats" class="form-control" rows="4" required>📈 Respaldo Táctico: [Escribe aquí tu análisis detallado]</textarea>
+                            <textarea id="pickStats" class="form-control" rows="3" required>📈 Respaldo Táctico: Análisis detallado aquí...</textarea>
                         </div>
                         <button type="submit" class="btn-action">🚀 Publicar Pronóstico</button>
                     </form>
@@ -466,13 +476,98 @@
     </div>
 
     <script>
-        let myPicks = [];
+        let userCredits = 20;
+
+        let myPicks = [
+            // 4 Líneas Sugeridas en Feed General
+            {
+                id: 'gen_1',
+                section: 'general',
+                teams: 'Real Madrid vs Valencia',
+                prob: '84%',
+                odd: '1.65',
+                cost: 2,
+                meta: '📅 Hoy • La Liga',
+                result: 'Victoria Real Madrid + Más de 1.5 goles',
+                stats: '📈 Respaldo: El Real Madrid ha ganado sus últimos 6 encuentros como local con un promedio de 2.8 goles a favor.'
+            },
+            {
+                id: 'gen_2',
+                section: 'general',
+                teams: 'Arsenal vs Chelsea',
+                prob: '78%',
+                odd: '1.75',
+                cost: 3,
+                meta: '📅 Mañana • Premier League',
+                result: 'Ambos Equipos Anotan (BTTS)',
+                stats: '📈 Respaldo: Los últimos 4 enfrentamientos directos entre ambos en este estadio registraron goles de ambos bandos.'
+            },
+            {
+                id: 'gen_3',
+                section: 'general',
+                teams: 'Inter de Milán vs Lazio',
+                prob: '82%',
+                odd: '1.55',
+                cost: 2,
+                meta: '📅 Hoy • Serie A',
+                result: 'Victoria Local (Inter)',
+                stats: '📈 Respaldo: La defensa del Inter en casa concede menos de 0.6 remates a puerta por partido en los últimos 90 minutos.'
+            },
+            {
+                id: 'gen_4',
+                section: 'general',
+                teams: 'Bayer Leverkusen vs Dortmund',
+                prob: '80%',
+                odd: '1.80',
+                cost: 3,
+                meta: '📅 Fin de Semana • Bundesliga',
+                result: 'Más de 2.5 Goles en el Partido',
+                stats: '📈 Respaldo: El promedio conjunto de xG de ambos equipos supera los 3.2 por encuentro.'
+            },
+
+            // 2 Picks VIP de Élite (Valores de 5 y 7 créditos)
+            {
+                id: 'vip_1',
+                section: 'vip',
+                teams: 'Manchester City vs Liverpool',
+                prob: '91%',
+                odd: '2.10',
+                cost: 5,
+                meta: '🌟 ÉLITE • Premier League VIP',
+                result: 'Victoria Manchester City + Más de 2.5 Goles',
+                stats: '👑 Respaldo VIP: Análisis táctico de posesión superior al 64% en transiciones rápidas y desgaste físico del rival.'
+            },
+            {
+                id: 'vip_2',
+                section: 'vip',
+                teams: 'Bayern Múnich vs RB Leipzig',
+                prob: '89%',
+                odd: '2.35',
+                cost: 7,
+                meta: '🌟 ÉLITE • Bundesliga VIP',
+                result: 'Handicap Asiático -1.5 Bayern Múnich',
+                stats: '👑 Respaldo VIP: Estudio de fatiga defensiva del visitante y efectividad del 92% en bloque alto.'
+            }
+        ];
 
         function fucLoginSuccess() {
-            // Oculta el login y muestra la aplicación hermosa con sus neones
+            const email = document.getElementById('loginEmail').value.trim();
+            
+            // EL BOTÓN DE EDITOR SOLO APARECE SI ENTRAS CON TU CORREO DE ADMIN O DEJAS ADMIN
+            if (email.includes('admin') || email === 'tucorreo@email.com' || email === '') {
+                document.getElementById('adminNavBtn').style.display = 'block';
+            } else {
+                document.getElementById('adminNavBtn').style.display = 'none';
+            }
+
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainAppContent').style.display = 'flex';
+            updateCreditDisplay();
             renderPicks();
+        }
+
+        function updateCreditDisplay() {
+            document.getElementById('creditDisplay').innerText = `💎 ${userCredits} Cr.`;
         }
 
         function renderPicks() {
@@ -481,12 +576,6 @@
             
             generalContainer.innerHTML = '';
             vipContainer.innerHTML = '';
-
-            if (myPicks.length === 0) {
-                generalContainer.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 15px; font-size: 12px;">No hay pronósticos activos. Usa el botón "Editor" arriba para publicar el primero.</p>`;
-                vipContainer.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 15px; font-size: 12px;">No hay pronósticos VIP activos.</p>`;
-                return;
-            }
 
             myPicks.forEach(pick => {
                 if (pick.section === 'general') {
@@ -497,14 +586,16 @@
                                     <span class="match-meta">${pick.meta} • Prob. ${pick.prob}</span>
                                     <span class="match-teams">${pick.teams}</span>
                                 </div>
-                                <div class="unlock-action" onclick="unlockPick('${pick.id}')">
+                                <div class="unlock-action" onclick="unlockPick('${pick.id}', ${pick.cost})">
                                     <span class="odd-hint">Cta: ${pick.odd}</span>
                                     <span class="credit-cost">💎 ${pick.cost} Cr.</span>
                                 </div>
                             </div>
                             <div class="unlocked-content" id="content-${pick.id}">
                                 <div class="pick-result-text">🎯 Pick: ${pick.result}</div>
-                                <button class="stats-accordion-btn" onclick="toggleStats('${pick.id}')">📊 Ver respaldo estadístico ▼</button>
+                                <button class="stats-accordion-btn" onclick="toggleStats('${pick.id}')">
+                                    <span>📊 Ver respaldo estadístico</span> <span>▼</span>
+                                </button>
                                 <div class="stats-details" id="stats-${pick.id}">${pick.stats}</div>
                             </div>
                         </div>
@@ -517,14 +608,16 @@
                                     <span class="match-meta" style="color: var(--neon-gold);">${pick.meta} • Prob. ${pick.prob}</span>
                                     <span class="match-teams">${pick.teams}</span>
                                 </div>
-                                <div class="unlock-action-vip" onclick="unlockPick('${pick.id}')">
+                                <div class="unlock-action-vip" onclick="unlockPick('${pick.id}', ${pick.cost})">
                                     <span class="odd-hint" style="color: #bfa143;">Cta: ${pick.odd}</span>
                                     <span class="credit-cost-vip">💎 ${pick.cost} Cr.</span>
                                 </div>
                             </div>
                             <div class="unlocked-content-vip" id="content-${pick.id}">
                                 <div class="pick-result-text-vip">🎯 Pick VIP: ${pick.result}</div>
-                                <button class="stats-accordion-btn-vip" onclick="toggleStats('${pick.id}')">📊 Ver respaldo estadístico VIP ▼</button>
+                                <button class="stats-accordion-btn-vip" onclick="toggleStats('${pick.id}')">
+                                    <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
+                                </button>
                                 <div class="stats-details-vip" id="stats-${pick.id}">${pick.stats}</div>
                             </div>
                         </div>
@@ -533,7 +626,15 @@
             });
         }
 
-        function unlockPick(id) {
+        function unlockPick(id, cost) {
+            if (userCredits < cost) {
+                alert('⚠️ No tienes suficientes créditos para desbloquear este pronóstico.');
+                return;
+            }
+
+            userCredits -= cost;
+            updateCreditDisplay();
+
             document.getElementById('card-' + id).style.borderColor = 'var(--neon-green)';
             const actionBtn = document.querySelector('#card-' + id + ' .unlock-action, #card-' + id + ' .unlock-action-vip');
             if(actionBtn) actionBtn.style.display = 'none';
@@ -548,7 +649,7 @@
         function handleCreatePick(e) {
             e.preventDefault();
             const newPick = {
-                id: Date.now().toString(),
+                id: 'custom_' + Date.now(),
                 section: document.getElementById('pickSection').value,
                 teams: document.getElementById('pickTeams').value,
                 prob: document.getElementById('pickProb').value,
@@ -561,7 +662,7 @@
 
             myPicks.unshift(newPick);
             renderPicks();
-            alert('¡Pronóstico publicado con éxito en el feed!');
+            alert('¡Pronóstico publicado con éxito!');
             switchView(newPick.section);
         }
 
