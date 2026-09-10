@@ -91,6 +91,7 @@
             font-weight: bold;
             color: var(--neon-green);
             box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+            cursor: pointer;
         }
 
         .main-layout {
@@ -440,7 +441,8 @@
                 <p>La estadística respalda</p>
             </div>
         </div>
-        <div class="user-credits" id="userCreditsDisplay">
+        <!-- Al hacer clic 3 veces rápidas en los créditos, podemos sumar saldo de prueba para testear -->
+        <div class="user-credits" id="userCreditsDisplay" onclick="agregarCreditosPrueba()" title="Haz clic para recargar créditos de prueba">
             💎 10 Cr.
         </div>
     </header>
@@ -463,6 +465,7 @@
             <!-- LISTA DE PICKS GENERALES -->
             <div class="picks-grid">
                 
+                <!-- Pick de 1 Crédito (Fácil acceso) -->
                 <div class="pick-card" id="card-1">
                     <div class="pick-header">
                         <div class="match-info">
@@ -487,15 +490,16 @@
                     </div>
                 </div>
 
+                <!-- Pick de 2 Créditos -->
                 <div class="pick-card" id="card-2">
                     <div class="pick-header">
                         <div class="match-info">
                             <span class="match-meta">📅 Hoy • Prob. 85%</span>
                             <span class="match-teams">Real Madrid vs [Rival]</span>
                         </div>
-                        <div class="unlock-action" onclick="unlockPick(2, 1)">
+                        <div class="unlock-action" onclick="unlockPick(2, 2)">
                             <span class="odd-hint">Cta: 1.40</span>
-                            <span class="credit-cost">💎 1 Cr.</span>
+                            <span class="credit-cost">💎 2 Cr.</span>
                         </div>
                     </div>
                     <div class="unlocked-content" id="content-2">
@@ -507,6 +511,31 @@
                         </button>
                         <div class="stats-details" id="stats-2">
                             Cumple la línea de 1.5 goles en el 92% de sus encuentros oficiales como local.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRUEBA DE 20 CRÉDITOS (Bloqueado con saldo inicial de 10) -->
+                <div class="pick-card" id="card-20">
+                    <div class="pick-header">
+                        <div class="match-info">
+                            <span class="match-meta" style="color: var(--neon-blue);">🔥 Megapick Combinado • Prob. 94%</span>
+                            <span class="match-teams">Parley Especial de Fin de Semana</span>
+                        </div>
+                        <div class="unlock-action" onclick="unlockPick(20, 20)">
+                            <span class="odd-hint">Cta: 4.50</span>
+                            <span class="credit-cost" style="color: var(--neon-blue);">💎 20 Cr.</span>
+                        </div>
+                    </div>
+                    <div class="unlocked-content" id="content-20">
+                        <div class="pick-result-text">
+                            <span>🎯 Pick: Triangulación de victorias locales + Under 3.5 global</span>
+                        </div>
+                        <button class="stats-accordion-btn" onclick="toggleStats(20)">
+                            <span>📊 Ver respaldo estadístico masivo</span> <span>▼</span>
+                        </button>
+                        <div class="stats-details" id="stats-20">
+                            Análisis cruzado de 50 partidos históricos con métricas de rendimiento físico y posesión del balón superior al 65%.
                         </div>
                     </div>
                 </div>
@@ -528,7 +557,7 @@
 
             <div class="picks-grid">
                 
-                <!-- Pick VIP 1 -->
+                <!-- Pick VIP 1 (4 Créditos) -->
                 <div class="pick-card-vip" id="vip-card-1">
                     <div class="pick-header">
                         <div class="match-info">
@@ -553,7 +582,7 @@
                     </div>
                 </div>
 
-                <!-- Pick VIP 2 -->
+                <!-- Pick VIP 2 (3 Créditos) -->
                 <div class="pick-card-vip" id="vip-card-2">
                     <div class="pick-header">
                         <div class="match-info">
@@ -594,10 +623,28 @@
     </div>
 
     <script>
-        let currentCredits = 10;
+        // 1. CARGAR DATOS PERSISTENTES O INICIALIZAR EN 10 CRÉDITOS
+        let currentCredits = localStorage.getItem('pb_credits') !== null 
+            ? parseInt(localStorage.getItem('pb_credits')) 
+            : 10; 
+
+        let unlockedPicks = JSON.parse(localStorage.getItem('pb_unlocked')) || {};
+
+        window.addEventListener('DOMContentLoaded', () => {
+            updateCreditsUI();
+            restaurarPicksDesbloqueados();
+        });
 
         function updateCreditsUI() {
             document.getElementById('userCreditsDisplay').innerText = `💎 ${currentCredits} Cr.`;
+            localStorage.setItem('pb_credits', currentCredits);
+        }
+
+        // Truco útil para pruebas: haz clic en el botón de créditos de arriba para recargar +10 y probar el de 20
+        function agregarCreditosPrueba() {
+            currentCredits += 10;
+            updateCreditsUI();
+            alert("¡Recarga de prueba exitosa! Se sumaron 10 créditos.");
         }
 
         function switchToVip() {
@@ -612,36 +659,67 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function unlockPick(id, cost) {
-            if (currentCredits < cost) {
-                alert("¡No tienes suficientes créditos! Recarga más para desbloquear este pick.");
-                return;
+        function desbloquearTarjetaVisual(cardId, contentId, isVip = false) {
+            const card = document.getElementById(cardId);
+            card.classList.add('unlocked-pulse');
+            
+            const btn = card.querySelector(isVip ? '.unlock-action-vip' : '.unlock-action');
+            if (btn) btn.style.display = 'none';
+            
+            document.getElementById(contentId).classList.add('show');
+        }
+
+        function restaurarPicksDesbloqueados() {
+            for (let id in unlockedPicks) {
+                if (unlockedPicks[id]) {
+                    if (id.startsWith('vip-')) {
+                        let num = id.replace('vip-', '');
+                        desbloquearTarjetaVisual('vip-card-' + num, 'vip-content-' + num, true);
+                    } else {
+                        desbloquearTarjetaVisual('card-' + id, 'content-' + id, false);
+                    }
+                }
             }
+        }
+
+        // MOTOR DE LÓGICA CONDICIONAL DE BLOQUEO/DESBLOQUEO
+        function unlockPick(id, cost) {
+            // CONDICIÓN DE RECHAZO: Saldo insuficiente con cálculo del faltante exacto
+            if (currentCredits < cost) {
+                let faltantes = cost - currentCredits;
+                alert(`⚠️ ¡Fondo insuficiente!\n\nEste pronóstico cuesta 💎 ${cost} Cr. y tu saldo actual es de 💎 ${currentCredits} Cr.\nTe faltan ${faltantes} créditos para poder desbloquearlo.`);
+                return; // Detiene la ejecución por completo
+            }
+
+            // CONDICIÓN DE ÉXITO: Descuento, registro y persistencia local
             currentCredits -= cost;
             updateCreditsUI();
 
-            const card = document.getElementById('card-' + id);
-            card.classList.add('unlocked-pulse');
-            card.querySelector('.unlock-action').style.display = 'none';
-            document.getElementById('content-' + id).classList.add('show');
+            unlockedPicks[id] = true;
+            localStorage.setItem('pb_unlocked', JSON.stringify(unlockedPicks));
+
+            desbloquearTarjetaVisual('card-' + id, 'content-' + id, false);
+        }
+
+        function unlockVip(id, cost) {
+            // CONDICIÓN DE RECHAZO VIP con cálculo exacto
+            if (currentCredits < cost) {
+                let faltantes = cost - currentCredits;
+                alert(`⚠️ ¡Fondo insuficiente VIP!\n\nEsta joya cuesta 💎 ${cost} Cr. y tu saldo es de 💎 ${currentCredits} Cr.\nTe faltan ${faltantes} créditos para acceder.`);
+                return;
+            }
+
+            currentCredits -= cost;
+            updateCreditsUI();
+
+            unlockedPicks['vip-' + id] = true;
+            localStorage.setItem('pb_unlocked', JSON.stringify(unlockedPicks));
+
+            desbloquearTarjetaVisual('vip-card-' + id, 'vip-content-' + id, true);
         }
 
         function toggleStats(id) {
             document.getElementById('stats-' + id).classList.toggle('show');
-        }
-
-        function unlockVip(id, cost) {
-            if (currentCredits < cost) {
-                alert("¡No tienes suficientes créditos VIP! Recarga saldo para acceder a esta joya.");
-                return;
-            }
-            currentCredits -= cost;
-            updateCreditsUI();
-
-            const card = document.getElementById('vip-card-' + id);
-            card.classList.add('unlocked-pulse');
-            card.querySelector('.unlock-action-vip').style.display = 'none';
-            document.getElementById('vip-content-' + id).classList.add('show');
         }
 
         function toggleVipStats(id) {
