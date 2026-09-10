@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Pizarra Bet | La estadística respalda, la pelota decide</title>
-    <!-- Librería cliente de Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-dark: #07090e;
@@ -14,7 +12,6 @@
             --neon-green: #00ff88;
             --neon-blue: #00d9ff;
             --neon-gold: #ffb700;
-            --neon-red: #ff3366;
             --text-main: #ffffff;
             --text-muted: #8b9bb4;
         }
@@ -34,6 +31,53 @@
             flex-direction: column;
         }
 
+        /* PANTALLA DE BLOQUEO / LOGIN INICIAL */
+        #loginScreen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .login-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--neon-green);
+            padding: 30px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-green);
+            margin: 0 auto;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+        .login-logo img { width: 85%; height: 85%; object-fit: contain; }
+
+        /* APLICACIÓN PRINCIPAL (OCULTA HASTA ENTRAR) */
+        #mainAppContent {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
         header {
             background-color: var(--card-bg);
             border-bottom: 2px solid var(--card-border);
@@ -48,6 +92,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            cursor: pointer;
         }
 
         .logo-circle {
@@ -64,18 +109,13 @@
             flex-shrink: 0;
         }
 
-        .logo-circle img {
-            width: 90%;
-            height: 90%;
-            object-fit: contain;
-        }
+        .logo-circle img { width: 90%; height: 90%; object-fit: contain; }
 
         .brand-text h1 {
             font-size: 16px;
             color: var(--neon-green);
             text-transform: uppercase;
             letter-spacing: 1px;
-            text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
         }
 
         .brand-text p {
@@ -99,10 +139,9 @@
             font-size: 12px;
             font-weight: bold;
             color: var(--neon-green);
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
         }
 
-        .admin-toggle-btn {
+        .admin-toggle-btn, .auth-btn {
             background-color: rgba(0, 217, 255, 0.1);
             border: 1px solid var(--neon-blue);
             color: var(--neon-blue);
@@ -111,23 +150,11 @@
             font-size: 11px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
-            display: none; /* Oculto hasta que Supabase verifique si eres master */
         }
-        .admin-toggle-btn:hover {
-            background-color: rgba(0, 217, 255, 0.2);
-            box-shadow: 0 0 8px rgba(0, 217, 255, 0.3);
-        }
-
         .auth-btn {
             background-color: rgba(0, 255, 136, 0.15);
-            border: 1px solid var(--neon-green);
+            border-color: var(--neon-green);
             color: var(--neon-green);
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
         }
 
         .main-layout {
@@ -140,7 +167,7 @@
             width: 100%;
         }
 
-        /* BANNER ANUNCIADOR VIP EN EL FEED GENERAL */
+        /* BANNER VIP */
         .vip-banner-box {
             background: linear-gradient(135deg, #1f1807 0%, #2b2005 100%);
             border: 2px solid var(--neon-gold);
@@ -149,12 +176,7 @@
             text-align: center;
             box-shadow: 0 0 20px rgba(255, 183, 0, 0.25);
             cursor: pointer;
-            transition: transform 0.2s;
         }
-        .vip-banner-box:hover {
-            transform: scale(1.01);
-        }
-
         .vip-badge-top {
             display: inline-block;
             background-color: rgba(255, 183, 0, 0.15);
@@ -167,23 +189,9 @@
             margin-bottom: 6px;
             border: 1px solid var(--neon-gold);
         }
-
-        .vip-banner-box h2 {
-            font-size: 15px;
-            margin-bottom: 4px;
-            color: var(--text-main);
-        }
-
-        .vip-banner-box h2 span {
-            color: var(--neon-gold);
-        }
-
-        .vip-banner-box p {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-
+        .vip-banner-box h2 { font-size: 15px; margin-bottom: 4px; color: var(--text-main); }
+        .vip-banner-box h2 span { color: var(--neon-gold); }
+        .vip-banner-box p { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
         .vip-action-hint {
             background-color: rgba(255, 183, 0, 0.2);
             border: 1px dashed var(--neon-gold);
@@ -194,8 +202,8 @@
             font-weight: bold;
         }
 
-        /* VISTA VIP EXCLUSIVA */
-        #vipView {
+        /* VISTAS */
+        #vipView, #adminView {
             display: none;
             flex-direction: column;
             gap: 15px;
@@ -208,15 +216,9 @@
             border-radius: 10px;
             text-align: center;
         }
+        .vip-view-title { font-size: 15px; font-weight: bold; color: var(--neon-gold); text-transform: uppercase; }
 
-        .vip-view-title {
-            font-size: 15px;
-            font-weight: bold;
-            color: var(--neon-gold);
-            text-transform: uppercase;
-        }
-
-        .back-to-feed-btn-bottom {
+        .back-btn {
             background-color: rgba(255, 183, 0, 0.15);
             border: 1px solid var(--neon-gold);
             color: var(--neon-gold);
@@ -226,53 +228,18 @@
             border-radius: 10px;
             cursor: pointer;
             text-align: center;
-            transition: background 0.2s;
-            box-shadow: 0 0 10px rgba(255, 183, 0, 0.15);
-        }
-        .back-to-feed-btn-bottom:hover {
-            background-color: rgba(255, 183, 0, 0.25);
         }
 
-        /* VISTA PANEL DE CONTROL (ADMIN) */
-        #adminView {
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        /* EDITOR ADMIN */
         .admin-card {
             background-color: var(--card-bg);
             border: 1px solid var(--neon-blue);
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 0 15px rgba(0, 217, 255, 0.15);
         }
-
-        .admin-title {
-            font-size: 16px;
-            color: var(--neon-blue);
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .form-group label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
+        .admin-title { font-size: 16px; color: var(--neon-blue); font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
+        .form-group { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
         .form-control {
             background-color: #07090e;
             border: 1px solid var(--card-border);
@@ -281,21 +248,10 @@
             color: var(--text-main);
             font-size: 13px;
         }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--neon-blue);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
-        .form-row .form-group {
-            flex: 1;
-        }
-
-        .btn-publish {
-            background: linear-gradient(135deg, #00d9ff 0%, #0088ff 100%);
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+        .btn-action {
+            background: linear-gradient(135deg, #00ff88 0%, #00b359 100%);
             color: #000;
             border: none;
             padding: 12px;
@@ -304,114 +260,13 @@
             font-size: 13px;
             cursor: pointer;
             width: 100%;
-            margin-top: 10px;
             text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
-            transition: opacity 0.2s;
-        }
-        .btn-publish:hover {
-            opacity: 0.9;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
         }
 
-        /* TARJETAS VIP Y GENERALES */
-        .pick-card-vip {
-            background-color: var(--card-bg);
-            border: 1px solid #3a2e0c;
-            border-radius: 10px;
-            padding: 12px 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .pick-card-vip.unlocked-pulse {
-            border-color: var(--neon-gold);
-            box-shadow: 0 0 15px rgba(255, 183, 0, 0.4);
-        }
-
-        .unlock-action-vip {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: #211904;
-            border: 1px solid #4a3a0e;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .unlock-action-vip:hover {
-            border-color: var(--neon-gold);
-            box-shadow: 0 0 8px rgba(255, 183, 0, 0.3);
-        }
-
-        .credit-cost-vip {
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--neon-gold);
-        }
-
-        .unlocked-content-vip {
-            display: none;
-            background-color: rgba(255, 183, 0, 0.05);
-            border: 1px dashed var(--neon-gold);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 4px;
-            flex-direction: column;
-            gap: 6px;
-            animation: fadeInContent 0.4s ease-in-out;
-        }
-        .unlocked-content-vip.show {
-            display: flex;
-        }
-
-        .pick-result-text-vip {
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--neon-gold);
-        }
-
-        .stats-accordion-btn-vip {
-            background: none;
-            border: none;
-            color: #ffcc4d;
-            font-size: 11px;
-            cursor: pointer;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 2px 0;
-        }
-
-        .stats-details-vip {
-            display: none;
-            font-size: 11px;
-            color: var(--text-muted);
-            background-color: rgba(0, 0, 0, 0.4);
-            padding: 8px;
-            border-radius: 6px;
-            border-left: 2px solid var(--neon-gold);
-            line-height: 1.4;
-        }
-        .stats-details-vip.show {
-            display: block;
-        }
-
-        #generalView {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .picks-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .pick-card {
+        /* TARJETAS DE PRONÓSTICOS */
+        .picks-grid { display: flex; flex-direction: column; gap: 10px; }
+        .pick-card, .pick-card-vip {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 10px;
@@ -419,36 +274,14 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .pick-card.unlocked-pulse {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
-        }
+        .pick-card-vip { border-color: #3a2e0c; }
+        .pick-header { display: flex; justify-content: space-between; align-items: center; }
+        .match-info { display: flex; flex-direction: column; }
+        .match-meta { font-size: 10px; color: var(--text-muted); }
+        .match-teams { font-size: 14px; font-weight: bold; color: var(--text-main); }
 
-        .pick-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .match-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .match-meta {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        .match-teams {
-            font-size: 14px;
-            font-weight: bold;
-            color: var(--text-main);
-        }
-
-        .unlock-action {
+        .unlock-action, .unlock-action-vip {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -457,25 +290,13 @@
             padding: 6px 12px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
         }
-        .unlock-action:hover {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
-        }
+        .unlock-action-vip { background-color: #211904; border-color: #4a3a0e; }
+        .credit-cost { font-size: 12px; font-weight: bold; color: var(--neon-green); }
+        .credit-cost-vip { font-size: 12px; font-weight: bold; color: var(--neon-gold); }
+        .odd-hint { font-size: 10px; color: var(--text-muted); }
 
-        .credit-cost {
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--neon-green);
-        }
-
-        .odd-hint {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        .unlocked-content {
+        .unlocked-content, .unlocked-content-vip {
             display: none;
             background-color: rgba(0, 255, 136, 0.05);
             border: 1px dashed var(--neon-green);
@@ -484,49 +305,22 @@
             margin-top: 4px;
             flex-direction: column;
             gap: 6px;
-            animation: fadeInContent 0.4s ease-in-out;
         }
-        .unlocked-content.show {
-            display: flex;
-        }
+        .unlocked-content-vip { background-color: rgba(255, 183, 0, 0.05); border-color: var(--neon-gold); }
+        .unlocked-content.show, .unlocked-content-vip.show { display: flex; }
 
-        @keyframes fadeInContent {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .pick-result-text { font-size: 12px; font-weight: bold; color: var(--neon-green); }
+        .pick-result-text-vip { font-size: 12px; font-weight: bold; color: var(--neon-gold); }
 
-        .pick-result-text {
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--neon-green);
+        .stats-accordion-btn, .stats-accordion-btn-vip {
+            background: none; border: none; color: var(--neon-blue); font-size: 11px; cursor: pointer; text-align: left;
         }
-
-        .stats-accordion-btn {
-            background: none;
-            border: none;
-            color: var(--neon-blue);
-            font-size: 11px;
-            cursor: pointer;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 2px 0;
+        .stats-accordion-btn-vip { color: #ffcc4d; }
+        .stats-details, .stats-details-vip {
+            display: none; font-size: 11px; color: var(--text-muted); background-color: rgba(0, 0, 0, 0.3); padding: 8px; border-radius: 6px; border-left: 2px solid var(--neon-blue); line-height: 1.4;
         }
-
-        .stats-details {
-            display: none;
-            font-size: 11px;
-            color: var(--text-muted);
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 8px;
-            border-radius: 6px;
-            border-left: 2px solid var(--neon-blue);
-            line-height: 1.4;
-        }
-        .stats-details.show {
-            display: block;
-        }
+        .stats-details-vip { border-left-color: var(--neon-gold); }
+        .stats-details.show, .stats-details-vip.show { display: block; }
 
         .disclaimer-box {
             background-color: var(--card-bg);
@@ -537,275 +331,147 @@
             font-size: 10px;
             color: var(--text-muted);
             line-height: 1.4;
-            margin-top: 5px;
-        }
-        .disclaimer-box strong {
-            color: var(--text-main);
-        }
-
-        /* MODAL DE LOGIN / REGISTRO */
-        .auth-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(7, 9, 14, 0.85);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .auth-modal-box {
-            background-color: var(--card-bg);
-            border: 1px solid var(--neon-green);
-            padding: 25px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 380px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-shadow: 0 0 25px rgba(0, 255, 136, 0.2);
-        }
-        .auth-tabs {
-            display: flex;
-            gap: 10px;
-            border-bottom: 1px solid var(--card-border);
-            padding-bottom: 8px;
-        }
-        .auth-tab {
-            background: none; border: none; color: var(--text-muted); font-weight: bold; font-size: 13px; cursor: pointer;
-        }
-        .auth-tab.active {
-            color: var(--neon-green);
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-container" style="cursor: pointer;" onclick="switchView('general')">
-            <div class="logo-circle">
-                <img src="logopb.png" alt="La Pizarra Bet Logo">
+    <!-- 1. PANTALLA DE LOGIN INICIAL (LO PRIMERO QUE SE VE) -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="logopb.png" alt="Logo">
             </div>
-            <div class="brand-text">
-                <h1>PizarraBet</h1>
-                <p>La estadística respalda</p>
-            </div>
-        </div>
-        <div class="header-controls">
-            <button class="admin-toggle-btn" id="adminToggleBtn" onclick="toggleAdminView()">⚙️ Panel Admin</button>
-            <button class="auth-btn" id="authBtnModal" onclick="openAuthModal()">🔑 Ingresar</button>
-            <div class="user-credits" id="userCreditsDisplay">
-                💎 -- Cr.
-            </div>
-        </div>
-    </header>
-
-    <div class="main-layout">
-        
-        <!-- VISTA GENERAL (FEED PRINCIPAL) -->
-        <div id="generalView">
+            <h2 style="color: var(--neon-green); font-size: 18px; text-transform: uppercase;">La Pizarra Bet</h2>
+            <p style="font-size: 11px; color: var(--text-muted);">La estadística respalda, la pelota decide</p>
             
-            <div class="vip-banner-box" onclick="switchView('vip')">
-                <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
-                <h2>PRONÓSTICOS VIP: <span>CUOTAS 1.85+</span></h2>
-                <p>Entra aquí para ver selecciones protegidas de alto valor analítico.</p>
-                <div class="vip-action-hint">
-                    ✨ Acceder a la Zona VIP (Mayor valor)
-                </div>
+            <div class="form-group" style="text-align: left; margin-top: 5px;">
+                <label>Correo Electrónico</label>
+                <input type="email" id="loginEmail" class="form-control" placeholder="tucorreo@email.com">
             </div>
-
-            <div class="picks-grid" id="generalPicksContainer">
-                <p style="color: var(--text-muted); text-align: center; padding: 20px;">Cargando pronósticos desde Supabase...</p>
+            <div class="form-group" style="text-align: left;">
+                <label>Contraseña</label>
+                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••">
             </div>
-
-            <div class="disclaimer-box">
-                <strong>Gestión:</strong> Destina 2%-3% de tu capital por jugada. La estadística respalda, la pelota decide.
-            </div>
-
-        </div>
-
-        <!-- VISTA VIP EXCLUSIVA -->
-        <div id="vipView">
             
-            <div class="vip-view-header">
-                <span class="vip-view-title">👑 Pronósticos VIP de Élite</span>
-            </div>
-
-            <div class="picks-grid" id="vipPicksContainer">
-                <p style="color: var(--text-muted); text-align: center; padding: 20px;">Cargando pronósticos VIP...</p>
-            </div>
-
-            <div class="back-to-feed-btn-bottom" onclick="switchView('general')">
-                ← Volver al Feed General
-            </div>
-
-            <div class="disclaimer-box" style="border-left-color: var(--neon-gold);">
-                <strong>Zona VIP:</strong> Selecciones de alto valor con cuotas superiores a 1.85. Analizadas minuciosamente.
-            </div>
-
+            <button class="btn-action" onclick="fucLoginSuccess()">🔑 Ingresar al Sistema</button>
         </div>
-
-        <!-- VISTA PANEL DE CONTROL (ADMIN) -->
-        <div id="adminView">
-            <div class="admin-card">
-                <div class="admin-title">🛠️ Carga y Gestión de Pronósticos (Master)</div>
-                
-                <form id="adminPickForm" onsubmit="handleCreatePick(event)">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Sección destino</label>
-                            <select id="pickSection" class="form-control">
-                                <option value="general">Feed General</option>
-                                <option value="vip">Zona VIP 🌟</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Costo en Créditos (💎)</label>
-                            <input type="number" id="pickCost" class="form-control" min="1" max="100" value="2" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Equipos / Partido</label>
-                            <input type="text" id="pickTeams" class="form-control" placeholder="Ej: Barcelona vs Real Madrid" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Probabilidad (%)</label>
-                            <input type="text" id="pickProb" class="form-control" placeholder="Ej: 88%" value="85%" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Cuota (Odd)</label>
-                            <input type="text" id="pickOdd" class="form-control" placeholder="Ej: 1.45" value="1.50" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha / Meta</label>
-                            <input type="text" id="pickMeta" class="form-control" value="📅 Hoy • Análisis Táctico" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Pronóstico (Pick exacto)</label>
-                        <input type="text" id="pickResult" class="form-control" placeholder="Ej: Victoria local + Más de 1.5 goles" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>📊 Respaldo Estadístico (Análisis detallado)</label>
-                        <textarea id="pickStats" class="form-control" rows="4" placeholder="Escribe aquí las métricas, rachas, xG..." required>📈 Respaldo Táctico: [Escribe aquí tu análisis detallado sobre posesión, xG, rendimiento de local/visitante...]</textarea>
-                    </div>
-
-                    <button type="submit" class="btn-publish">🚀 Publicar Nuevo Pronóstico en Base de Datos</button>
-                </form>
-            </div>
-
-            <div class="back-to-feed-btn-bottom" onclick="switchView('general')">
-                ← Volver al Feed de Usuario
-            </div>
-        </div>
-
     </div>
 
-    <!-- MODAL DE LOGIN / REGISTRO -->
-    <div class="auth-modal-overlay" id="authModal">
-        <div class="auth-modal-box">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="color: var(--neon-green); font-size: 15px;">Acceso a La Pizarra Bet</h3>
-                <button onclick="closeAuthModal()" style="background:none; border:none; color:var(--text-main); font-size:16px; cursor:pointer;">✕</button>
-            </div>
-            <div class="auth-tabs">
-                <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Iniciar Sesión</button>
-                <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Registrarse (10 Créditos)</button>
-            </div>
-            <form id="authForm" onsubmit="handleAuthSubmit(event)" style="display: flex; flex-direction: column; gap: 10px;">
-                <div class="form-group">
-                    <label>Correo Electrónico</label>
-                    <input type="email" id="authEmail" class="form-control" required>
+    <!-- 2. APLICACIÓN COMPLETA CON NEONES Y DISEÑO (SE MUESTRA TRAS INGRESAR) -->
+    <div id="mainAppContent">
+        <header>
+            <div class="logo-container" onclick="switchView('general')">
+                <div class="logo-circle">
+                    <img src="logopb.png" alt="Logo">
                 </div>
-                <div class="form-group">
-                    <label>Contraseña</label>
-                    <input type="password" id="authPassword" class="form-control" required>
+                <div class="brand-text">
+                    <h1>PizarraBet</h1>
+                    <p>La estadística respalda</p>
                 </div>
-                <button type="submit" class="btn-publish" id="authSubmitBtn" style="margin-top: 5px;">Entrar</button>
-            </form>
+            </div>
+            <div class="header-controls">
+                <button class="admin-toggle-btn" onclick="switchView('admin')">⚙️ Editor</button>
+                <button class="auth-btn" onclick="location.reload()">Cerrar Sesión</button>
+                <div class="user-credits">💎 10 Cr.</div>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            
+            <!-- FEED GENERAL -->
+            <div id="generalView">
+                <div class="vip-banner-box" onclick="switchView('vip')">
+                    <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
+                    <h2>PRONÓSTICOS VIP: <span>CUOTAS 1.85+</span></h2>
+                    <p>Entra aquí para ver selecciones protegidas de alto valor analítico.</p>
+                    <div class="vip-action-hint">✨ Acceder a la Zona VIP</div>
+                </div>
+
+                <div class="picks-grid" id="generalPicksContainer">
+                    <!-- Aquí aparecerán tus pronósticos del feed cuando los crees -->
+                </div>
+
+                <div class="disclaimer-box">
+                    <strong>Gestión:</strong> Destina 2%-3% de tu capital por jugada. La estadística respalda, la pelota decide.
+                </div>
+            </div>
+
+            <!-- VISTA VIP -->
+            <div id="vipView">
+                <div class="vip-view-header">
+                    <span class="vip-view-title">👑 Pronósticos VIP de Élite</span>
+                </div>
+
+                <div class="picks-grid" id="vipPicksContainer">
+                    <!-- Aquí aparecerán tus pronósticos VIP cuando los crees -->
+                </div>
+
+                <div class="back-btn" onclick="switchView('general')">← Volver al Feed General</div>
+            </div>
+
+            <!-- EDITOR (CREAR PRONÓSTICOS) -->
+            <div id="adminView">
+                <div class="admin-card">
+                    <div class="admin-title">🛠️ Editor de Pronósticos</div>
+                    <form id="adminPickForm" onsubmit="handleCreatePick(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Sección</label>
+                                <select id="pickSection" class="form-control">
+                                    <option value="general">Feed General</option>
+                                    <option value="vip">Zona VIP 🌟</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Costo (Créditos)</label>
+                                <input type="number" id="pickCost" class="form-control" value="2" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Equipos</label>
+                                <input type="text" id="pickTeams" class="form-control" placeholder="Ej: Real Madrid vs Barcelona" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Probabilidad</label>
+                                <input type="text" id="pickProb" class="form-control" value="85%" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Cuota</label>
+                                <input type="text" id="pickOdd" class="form-control" value="1.50" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Fecha / Meta</label>
+                                <input type="text" id="pickMeta" class="form-control" value="📅 Hoy • Análisis Táctico" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Pronóstico (Pick exacto)</label>
+                            <input type="text" id="pickResult" class="form-control" placeholder="Ej: Victoria local + Más de 1.5 goles" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Respaldo Estadístico</label>
+                            <textarea id="pickStats" class="form-control" rows="4" required>📈 Respaldo Táctico: [Escribe aquí tu análisis detallado]</textarea>
+                        </div>
+                        <button type="submit" class="btn-action">🚀 Publicar Pronóstico</button>
+                    </form>
+                </div>
+                <div class="back-btn" onclick="switchView('general')">← Volver al Feed</div>
+            </div>
+
         </div>
     </div>
 
     <script>
-        // Configuración oficial de Supabase
-        const SUPABASE_URL = 'https://grqoeyhrejzdsbbonjqk.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_DMZGeboSDss26jQoSO3SiA_CVxP51Wy';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let myPicks = [];
 
-        let currentUser = null;
-        let userProfile = null;
-        let isRegistering = false;
-        let allPicks = [];
-        let unlockedCache = {};
-
-        window.addEventListener('DOMContentLoaded', async () => {
-            await checkSession();
-            await loadPicksFromSupabase();
-        });
-
-        async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                currentUser = session.user;
-                await fetchProfileAndCredits(currentUser.id);
-                document.getElementById('authBtnModal').innerText = '👤 ' + currentUser.email.split('@')[0];
-                document.getElementById('authBtnModal').onclick = handleLogout;
-            } else {
-                document.getElementById('userCreditsDisplay').innerText = `💎 Inicia Sesión`;
-            }
-        }
-
-        async function fetchProfileAndCredits(userId) {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
-
-            if (data) {
-                userProfile = data;
-                document.getElementById('userCreditsDisplay').innerText = `💎 ${data.credits} Cr.`;
-                if (data.role === 'master') {
-                    document.getElementById('adminToggleBtn').style.display = 'block';
-                }
-            }
-        }
-
-        async function loadPicksFromSupabase() {
-            // Cargar picks de la tabla public.picks
-            const { data: picksData, error: picksError } = await supabase
-                .from('picks')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            if (picksError) {
-                console.error('Error cargando picks:', picksError.message);
-                return;
-            }
-
-            allPicks = picksData || [];
-
-            // Si el usuario está logueado, cargar sus desbloqueos
-            if (currentUser) {
-                const { data: unlocksData } = await supabase
-                    .from('user_unlocks')
-                    .select('pick_id')
-                    .eq('user_id', currentUser.id);
-
-                if (unlocksData) {
-                    unlocksData.forEach(u => {
-                        unlockedCache[u.pick_id] = true;
-                    });
-                }
-            }
-
+        function fucLoginSuccess() {
+            // Oculta el login y muestra la aplicación hermosa con sus neones
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainAppContent').style.display = 'flex';
             renderPicks();
         }
 
@@ -816,67 +482,50 @@
             generalContainer.innerHTML = '';
             vipContainer.innerHTML = '';
 
-            if (allPicks.length === 0) {
-                generalContainer.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 20px;">No hay pronósticos publicados todavía.</p>`;
-                vipContainer.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 20px;">No hay pronósticos VIP publicados todavía.</p>`;
+            if (myPicks.length === 0) {
+                generalContainer.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 15px; font-size: 12px;">No hay pronósticos activos. Usa el botón "Editor" arriba para publicar el primero.</p>`;
+                vipContainer.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 15px; font-size: 12px;">No hay pronósticos VIP activos.</p>`;
                 return;
             }
 
-            allPicks.forEach(pick => {
-                const isUnlocked = unlockedCache[pick.id] || false;
-                const unlockedClass = isUnlocked ? 'unlocked-pulse' : '';
-                const btnDisplay = isUnlocked ? 'none' : 'flex';
-                const contentShow = isUnlocked ? 'show' : '';
-
+            myPicks.forEach(pick => {
                 if (pick.section === 'general') {
                     generalContainer.innerHTML += `
-                        <div class="pick-card ${unlockedClass}" id="card-${pick.id}">
+                        <div class="pick-card" id="card-${pick.id}">
                             <div class="pick-header">
                                 <div class="match-info">
                                     <span class="match-meta">${pick.meta} • Prob. ${pick.prob}</span>
                                     <span class="match-teams">${pick.teams}</span>
                                 </div>
-                                <div class="unlock-action" id="action-btn-${pick.id}" style="display: ${btnDisplay};" onclick="unlockPick('${pick.id}', ${pick.cost})">
+                                <div class="unlock-action" onclick="unlockPick('${pick.id}')">
                                     <span class="odd-hint">Cta: ${pick.odd}</span>
                                     <span class="credit-cost">💎 ${pick.cost} Cr.</span>
                                 </div>
                             </div>
-                            <div class="unlocked-content ${contentShow}" id="content-${pick.id}">
-                                <div class="pick-result-text">
-                                    <span>🎯 Pick: ${pick.result}</span>
-                                </div>
-                                <button class="stats-accordion-btn" onclick="toggleStats('${pick.id}')">
-                                    <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                                </button>
-                                <div class="stats-details" id="stats-${pick.id}">
-                                    ${pick.stats}
-                                </div>
+                            <div class="unlocked-content" id="content-${pick.id}">
+                                <div class="pick-result-text">🎯 Pick: ${pick.result}</div>
+                                <button class="stats-accordion-btn" onclick="toggleStats('${pick.id}')">📊 Ver respaldo estadístico ▼</button>
+                                <div class="stats-details" id="stats-${pick.id}">${pick.stats}</div>
                             </div>
                         </div>
                     `;
                 } else {
                     vipContainer.innerHTML += `
-                        <div class="pick-card-vip ${unlockedClass}" id="card-${pick.id}">
+                        <div class="pick-card-vip" id="card-${pick.id}">
                             <div class="pick-header">
                                 <div class="match-info">
                                     <span class="match-meta" style="color: var(--neon-gold);">${pick.meta} • Prob. ${pick.prob}</span>
                                     <span class="match-teams">${pick.teams}</span>
                                 </div>
-                                <div class="unlock-action-vip" id="action-btn-${pick.id}" style="display: ${btnDisplay};" onclick="unlockPick('${pick.id}', ${pick.cost})">
+                                <div class="unlock-action-vip" onclick="unlockPick('${pick.id}')">
                                     <span class="odd-hint" style="color: #bfa143;">Cta: ${pick.odd}</span>
                                     <span class="credit-cost-vip">💎 ${pick.cost} Cr.</span>
                                 </div>
                             </div>
-                            <div class="unlocked-content-vip ${contentShow}" id="content-${pick.id}">
-                                <div class="pick-result-text-vip">
-                                    <span>🎯 Pick VIP: ${pick.result}</span>
-                                </div>
-                                <button class="stats-accordion-btn-vip" onclick="toggleStats('${pick.id}')">
-                                    <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
-                                </button>
-                                <div class="stats-details-vip" id="stats-${pick.id}">
-                                    ${pick.stats}
-                                </div>
+                            <div class="unlocked-content-vip" id="content-${pick.id}">
+                                <div class="pick-result-text-vip">🎯 Pick VIP: ${pick.result}</div>
+                                <button class="stats-accordion-btn-vip" onclick="toggleStats('${pick.id}')">📊 Ver respaldo estadístico VIP ▼</button>
+                                <div class="stats-details-vip" id="stats-${pick.id}">${pick.stats}</div>
                             </div>
                         </div>
                     `;
@@ -884,56 +533,22 @@
             });
         }
 
-        async function unlockPick(pickId, cost) {
-            if (!currentUser) {
-                alert("⚠️ Debes iniciar sesión para desbloquear pronósticos.");
-                openAuthModal();
-                return;
-            }
-
-            if (userProfile.credits < cost) {
-                alert(`⚠️ Fondos insuficientes. Tienes 💎 ${userProfile.credits} Cr. y este pick cuesta 💎 ${cost} Cr.`);
-                return;
-            }
-
-            // Descontar créditos en la base de datos de Supabase
-            const newCredits = userProfile.credits - cost;
-            const { error: updateError } = await supabase
-                .from('profiles')
-                .update({ credits: newCredits })
-                .eq('id', currentUser.id);
-
-            if (updateError) {
-                alert("Error al procesar créditos: " + updateError.message);
-                return;
-            }
-
-            // Registrar el desbloqueo en la tabla user_unlocks
-            const { error: unlockError } = await supabase
-                .from('user_unlocks')
-                .insert([{ user_id: currentUser.id, pick_id: pickId }]);
-
-            if (unlockError) {
-                console.error(unlockError);
-            }
-
-            userProfile.credits = newCredits;
-            document.getElementById('userCreditsDisplay').innerText = `💎 ${newCredits} Cr.`;
-            unlockedCache[pickId] = true;
-
-            // Mostrar la tarjeta visualmente
-            const card = document.getElementById('card-' + pickId);
-            if (card) card.classList.add('unlocked-pulse');
-            const btn = document.getElementById('action-btn-' + pickId);
-            if (btn) btn.style.display = 'none';
-            const content = document.getElementById('content-' + pickId);
-            if (content) content.classList.add('show');
+        function unlockPick(id) {
+            document.getElementById('card-' + id).style.borderColor = 'var(--neon-green)';
+            const actionBtn = document.querySelector('#card-' + id + ' .unlock-action, #card-' + id + ' .unlock-action-vip');
+            if(actionBtn) actionBtn.style.display = 'none';
+            document.getElementById('content-' + id).classList.add('show');
         }
 
-        async function handleCreatePick(e) {
-            e.preventDefault();
+        function toggleStats(id) {
+            const stats = document.getElementById('stats-' + id);
+            if (stats) stats.classList.toggle('show');
+        }
 
+        function handleCreatePick(e) {
+            e.preventDefault();
             const newPick = {
+                id: Date.now().toString(),
                 section: document.getElementById('pickSection').value,
                 teams: document.getElementById('pickTeams').value,
                 prob: document.getElementById('pickProb').value,
@@ -944,16 +559,10 @@
                 stats: document.getElementById('pickStats').value
             };
 
-            const { error } = await supabase.from('picks').insert([newPick]);
-
-            if (error) {
-                alert("Error al publicar en Supabase (asegúrate de tener rol 'master'): " + error.message);
-            } else {
-                alert("¡Pronóstico publicado con éxito en Supabase!");
-                document.getElementById('adminPickForm').reset();
-                switchView(newPick.section);
-                await loadPicksFromSupabase();
-            }
+            myPicks.unshift(newPick);
+            renderPicks();
+            alert('¡Pronóstico publicado con éxito en el feed!');
+            switchView(newPick.section);
         }
 
         function switchView(viewName) {
@@ -962,61 +571,6 @@
             document.getElementById('adminView').style.display = viewName === 'admin' ? 'flex' : 'none';
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
-        function toggleAdminView() {
-            const adminView = document.getElementById('adminView');
-            if (adminView.style.display === 'flex') {
-                switchView('general');
-            } else {
-                switchView('admin');
-            }
-        }
-
-        function toggleStats(id) {
-            const stats = document.getElementById('stats-' + id);
-            if (stats) stats.classList.toggle('show');
-        }
-
-        // Control del Modal de Autenticación
-        function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
-        function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
-
-        function switchAuthTab(tab) {
-            isRegistering = (tab === 'register');
-            document.getElementById('tabLogin').className = isRegistering ? 'auth-tab' : 'auth-tab active';
-            document.getElementById('tabRegister').className = isRegistering ? 'auth-tab active' : 'auth-tab';
-            document.getElementById('authSubmitBtn').innerText = isRegistering ? 'Registrarse y Obtener 10 Cr.' : 'Entrar';
-        }
-
-        async function handleAuthSubmit(e) {
-            e.preventDefault();
-            const email = document.getElementById('authEmail').value;
-            const password = document.getElementById('authPassword').value;
-
-            if (isRegistering) {
-                const { data, error } = await supabase.auth.signUp({ email, password });
-                if (error) {
-                    alert("Error en el registro: " + error.message);
-                } else {
-                    alert("¡Registro exitoso! Ya puedes iniciar sesión. Recuerda que se te asignaron 10 créditos automáticos.");
-                    switchAuthTab('login');
-                }
-            } else {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) {
-                    alert("Error al entrar: " + error.message);
-                } else {
-                    closeAuthModal();
-                    window.location.reload();
-                }
-            }
-        }
-
-        async function handleLogout() {
-            await supabase.auth.signOut();
-            window.location.reload();
-        }
     </script>
-
 </body>
 </html>
