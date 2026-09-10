@@ -11,6 +11,7 @@
             --card-border: #1e2638;
             --neon-green: #00ff88;
             --neon-blue: #00d9ff;
+            --neon-gold: #ffb700;
             --text-main: #ffffff;
             --text-muted: #8b9bb4;
         }
@@ -81,7 +82,6 @@
             text-transform: uppercase;
         }
 
-        /* HEADER USER CREDITS */
         .user-credits {
             background-color: #161f33;
             border: 1px solid var(--neon-green);
@@ -103,61 +103,175 @@
             width: 100%;
         }
 
-        /* CAJA VIP NEÓN COMPACTA */
-        .vip-neon-box {
-            background: linear-gradient(135deg, #0d1b1e 0%, #112a24 100%);
-            border: 2px solid var(--neon-green);
+        /* BANNER ANUNCIADOR VIP EN EL FEED GENERAL */
+        .vip-banner-box {
+            background: linear-gradient(135deg, #1f1807 0%, #2b2005 100%);
+            border: 2px solid var(--neon-gold);
             border-radius: 12px;
             padding: 16px;
             text-align: center;
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 20px rgba(255, 183, 0, 0.25);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .vip-banner-box:hover {
+            transform: scale(1.01);
         }
 
         .vip-badge-top {
             display: inline-block;
-            background-color: rgba(0, 255, 136, 0.15);
-            color: var(--neon-green);
+            background-color: rgba(255, 183, 0, 0.15);
+            color: var(--neon-gold);
             font-size: 9px;
             font-weight: bold;
             padding: 3px 8px;
             border-radius: 20px;
             text-transform: uppercase;
             margin-bottom: 6px;
-            border: 1px solid var(--neon-green);
+            border: 1px solid var(--neon-gold);
         }
 
-        .vip-neon-box h2 {
+        .vip-banner-box h2 {
             font-size: 15px;
             margin-bottom: 4px;
             color: var(--text-main);
         }
 
-        .vip-neon-box h2 span {
-            color: var(--neon-green);
+        .vip-banner-box h2 span {
+            color: var(--neon-gold);
         }
 
-        .vip-neon-box p {
+        .vip-banner-box p {
             font-size: 11px;
             color: var(--text-muted);
             margin-bottom: 10px;
         }
 
-        .vip-locked-btn {
-            background-color: rgba(0, 255, 136, 0.2);
-            border: 1px dashed var(--neon-green);
+        .vip-action-hint {
+            background-color: rgba(255, 183, 0, 0.2);
+            border: 1px dashed var(--neon-gold);
             padding: 8px;
             border-radius: 8px;
             font-size: 11px;
-            color: var(--neon-green);
+            color: var(--neon-gold);
             font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .vip-locked-btn:hover {
-            background-color: rgba(0, 255, 136, 0.3);
         }
 
-        /* GRID DE PICKS COMPACTOS (ESTILO LISTA FLUÍDA) */
+        /* VISTA VIP EXCLUSIVA (OCULTA POR DEFECTO) */
+        #vipView {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .vip-view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #2b2005 0%, #1f1807 100%);
+            border: 1px solid var(--neon-gold);
+            padding: 12px 15px;
+            border-radius: 10px;
+        }
+
+        .vip-view-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--neon-gold);
+            text-transform: uppercase;
+        }
+
+        .back-to-feed-btn {
+            background: none;
+            border: 1px solid var(--text-muted);
+            color: var(--text-main);
+            font-size: 11px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .back-to-feed-btn:hover {
+            border-color: var(--neon-gold);
+            color: var(--neon-gold);
+        }
+
+        /* TARJETAS VIP (ESTILO DORADO/ÁMBAR EXCLUSIVO) */
+        .pick-card-vip {
+            background-color: var(--card-bg);
+            border: 1px solid #3a2e0c;
+            border-radius: 10px;
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: border-color 0.2s;
+        }
+        .pick-card-vip:hover {
+            border-color: var(--neon-gold);
+        }
+
+        .unlock-action-vip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #211904;
+            border: 1px solid #4a3a0e;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .unlock-action-vip:hover {
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 8px rgba(255, 183, 0, 0.3);
+        }
+
+        .credit-cost-vip {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--neon-gold);
+        }
+
+        .unlocked-content-vip {
+            display: none;
+            background-color: rgba(255, 183, 0, 0.05);
+            border: 1px dashed var(--neon-gold);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 4px;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .unlocked-content-vip.show {
+            display: flex;
+        }
+
+        .pick-result-text-vip {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--neon-gold);
+        }
+
+        .stats-accordion-btn-vip {
+            background: none;
+            border: none;
+            color: #ffcc4d;
+            font-size: 11px;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 0;
+        }
+
+        /* GRID DE PICKS GENERALES */
+        #generalView {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
         .picks-grid {
             display: flex;
             flex-direction: column;
@@ -172,11 +286,6 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            transition: border-color 0.2s;
-        }
-
-        .pick-card:hover {
-            border-color: var(--card-border);
         }
 
         .pick-header {
@@ -201,7 +310,6 @@
             color: var(--text-main);
         }
 
-        /* BOTÓN DIAMANTE / CRÉDITOS (ESTADO BLOQUEADO) */
         .unlock-action {
             display: flex;
             align-items: center;
@@ -213,7 +321,6 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .unlock-action:hover {
             border-color: var(--neon-green);
             box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
@@ -230,7 +337,6 @@
             color: var(--text-muted);
         }
 
-        /* CONTENIDO DESBLOQUEADO (OCULTO POR DEFECTO) */
         .unlocked-content {
             display: none;
             background-color: rgba(0, 255, 136, 0.05);
@@ -241,7 +347,6 @@
             flex-direction: column;
             gap: 6px;
         }
-
         .unlocked-content.show {
             display: flex;
         }
@@ -250,9 +355,6 @@
             font-size: 12px;
             font-weight: bold;
             color: var(--neon-green);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .stats-accordion-btn {
@@ -278,7 +380,6 @@
             border-left: 2px solid var(--neon-blue);
             line-height: 1.4;
         }
-
         .stats-details.show {
             display: block;
         }
@@ -294,7 +395,6 @@
             line-height: 1.4;
             margin-top: 5px;
         }
-
         .disclaimer-box strong {
             color: var(--text-main);
         }
@@ -319,170 +419,180 @@
 
     <div class="main-layout">
         
-        <!-- CAJA VIP NEÓN COMPACTA -->
-        <div class="vip-neon-box">
-            <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
-            <h2>PICK VIP: <span>CUOTA DE ALTO VALOR</span></h2>
-            <p>Análisis avanzado con +85% de probabilidad estimada.</p>
-            <div class="vip-locked-btn" onclick="alert('Sistema de créditos VIP en configuración')">
-                🔒 Desbloquear por 3 Créditos
-            </div>
-        </div>
-
-        <!-- LISTA DE PICKS COMPACTOS (Simulando varios en pantalla) -->
-        <div class="picks-grid" id="picksContainer">
+        <!-- VISTA GENERAL (FEED PRINCIPAL) -->
+        <div id="generalView">
             
-            <!-- Tarjeta Pick 1 -->
-            <div class="pick-card" id="card-1">
-                <div class="pick-header">
-                    <div class="match-info">
-                        <span class="match-meta">📅 Hoy • Prob. 72%</span>
-                        <span class="match-teams">Wrexham vs [Rival]</span>
-                    </div>
-                    <!-- Botón de Bloqueo con Diamante y Costo -->
-                    <div class="unlock-action" onclick="unlockPick(1)">
-                        <span class="odd-hint">Cta: 1.75</span>
-                        <span class="credit-cost">💎 1 Cr.</span>
-                    </div>
-                </div>
-                <!-- Contenido que se revela al pagar -->
-                <div class="unlocked-content" id="content-1">
-                    <div class="pick-result-text">
-                        <span>🎯 Pick: Wrexham o Empate + Menos de 3.5 Goles</span>
-                    </div>
-                    <button class="stats-accordion-btn" onclick="toggleStats(1)">
-                        <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                    </button>
-                    <div class="stats-details" id="stats-1">
-                        Wrexham mantiene un invicto del 91% como local en los últimos 10 encuentros, combinándose con partidos de bajo promedio de anotación total.
-                    </div>
+            <!-- BANNER ANUNCIADOR VIP -->
+            <div class="vip-banner-box" onclick="switchToVip()">
+                <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
+                <h2>PRONÓSTICOS VIP: <span>CUOTAS 1.85+</span></h2>
+                <p>Entra aquí para ver 3 selecciones protegidas de alto valor analítico.</p>
+                <div class="vip-action-hint">
+                    ✨ Acceder a la Zona VIP (Mayor valor)
                 </div>
             </div>
 
-            <!-- Tarjeta Pick 2 -->
-            <div class="pick-card" id="card-2">
-                <div class="pick-header">
-                    <div class="match-info">
-                        <span class="match-meta">📅 Hoy • Prob. 74%</span>
-                        <span class="match-teams">Real Madrid vs Inter</span>
+            <!-- LISTA DE PICKS GENERALES (Cuotas <= 1.40, Costo 1-2 Cr.) -->
+            <div class="picks-grid">
+                
+                <div class="pick-card" id="card-1">
+                    <div class="pick-header">
+                        <div class="match-info">
+                            <span class="match-meta">📅 Hoy • Prob. 88%</span>
+                            <span class="match-teams">Wrexham vs [Rival]</span>
+                        </div>
+                        <div class="unlock-action" onclick="unlockPick(1)">
+                            <span class="odd-hint">Cta: 1.35</span>
+                            <span class="credit-cost">💎 1 Cr.</span>
+                        </div>
                     </div>
-                    <div class="unlock-action" onclick="unlockPick(2)">
-                        <span class="odd-hint">Cta: 1.85</span>
-                        <span class="credit-cost">💎 1 Cr.</span>
+                    <div class="unlocked-content" id="content-1">
+                        <div class="pick-result-text">
+                            <span>🎯 Pick: Wrexham o Empate (Doble Oportunidad)</span>
+                        </div>
+                        <button class="stats-accordion-btn" onclick="toggleStats(1)">
+                            <span>📊 Ver respaldo estadístico</span> <span>▼</span>
+                        </button>
+                        <div class="stats-details" id="stats-1">
+                            Control absoluto de localía con 91% de partidos sumando puntos en los últimos meses.
+                        </div>
                     </div>
                 </div>
-                <div class="unlocked-content" id="content-2">
-                    <div class="pick-result-text">
-                        <span>🎯 Pick: Ambos Equipos Anotan (BTTS)</span>
+
+                <div class="pick-card" id="card-2">
+                    <div class="pick-header">
+                        <div class="match-info">
+                            <span class="match-meta">📅 Hoy • Prob. 85%</span>
+                            <span class="match-teams">Real Madrid vs [Rival]</span>
+                        </div>
+                        <div class="unlock-action" onclick="unlockPick(2)">
+                            <span class="odd-hint">Cta: 1.40</span>
+                            <span class="credit-cost">💎 1 Cr.</span>
+                        </div>
                     </div>
-                    <button class="stats-accordion-btn" onclick="toggleStats(2)">
-                        <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                    </button>
-                    <div class="stats-details" id="stats-2">
-                        Ambos conjuntos superan el 80% de efectividad marcando gol en sus compromisos recientes de competición europea.
+                    <div class="unlocked-content" id="content-2">
+                        <div class="pick-result-text">
+                            <span>🎯 Pick: Más de 1.5 Goles en el partido</span>
+                        </div>
+                        <button class="stats-accordion-btn" onclick="toggleStats(2)">
+                            <span>📊 Ver respaldo estadístico</span> <span>▼</span>
+                        </button>
+                        <div class="stats-details" id="stats-2">
+                            Cumple la línea de 1.5 goles en el 92% de sus encuentros oficiales como local.
+                        </div>
                     </div>
                 </div>
+
             </div>
 
-            <!-- Tarjeta Pick 3 -->
-            <div class="pick-card" id="card-3">
-                <div class="pick-header">
-                    <div class="match-info">
-                        <span class="match-meta">📅 Hoy • Prob. 90%</span>
-                        <span class="match-teams">Inter vs [Rival]</span>
-                    </div>
-                    <div class="unlock-action" onclick="unlockPick(3)">
-                        <span class="odd-hint">Cta: 1.50</span>
-                        <span class="credit-cost">💎 1 Cr.</span>
-                    </div>
-                </div>
-                <div class="unlocked-content" id="content-3">
-                    <div class="pick-result-text">
-                        <span>🎯 Pick: Multigol de 1 a 3 goles del Inter</span>
-                    </div>
-                    <button class="stats-accordion-btn" onclick="toggleStats(3)">
-                        <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                    </button>
-                    <div class="stats-details" id="stats-3">
-                        El Inter anota en promedio 2.1 goles por partido fuera de casa, cumpliendo esta franja de multigol en el 88% de los casos.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tarjeta Pick 4 -->
-            <div class="pick-card" id="card-4">
-                <div class="pick-header">
-                    <div class="match-info">
-                        <span class="match-meta">📅 Hoy • Prob. 73%</span>
-                        <span class="match-teams">Ind. Santa Fe vs [Rival]</span>
-                    </div>
-                    <div class="unlock-action" onclick="unlockPick(4)">
-                        <span class="odd-hint">Cta: 1.90</span>
-                        <span class="credit-cost">💎 2 Cr.</span>
-                    </div>
-                </div>
-                <div class="unlocked-content" id="content-4">
-                    <div class="pick-result-text">
-                        <span>🎯 Pick: Santa Fe o Empate + Multigol 2-3</span>
-                    </div>
-                    <button class="stats-accordion-btn" onclick="toggleStats(4)">
-                        <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                    </button>
-                    <div class="stats-details" id="stats-4">
-                        Solidez defensiva notable en condición de local, recibiendo menos de 0.6 goles por encuentro en el torneo actual.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tarjeta Pick 5 -->
-            <div class="pick-card" id="card-5">
-                <div class="pick-header">
-                    <div class="match-info">
-                        <span class="match-meta">📅 Hoy • Prob. 74%</span>
-                        <span class="match-teams">Fluminense vs [Rival]</span>
-                    </div>
-                    <div class="unlock-action" onclick="unlockPick(5)">
-                        <span class="odd-hint">Cta: 1.80</span>
-                        <span class="credit-cost">💎 1 Cr.</span>
-                    </div>
-                </div>
-                <div class="unlocked-content" id="content-5">
-                    <div class="pick-result-text">
-                        <span>🎯 Pick: Fluminense o Empate + Menos de 3.5</span>
-                    </div>
-                    <button class="stats-accordion-btn" onclick="toggleStats(5)">
-                        <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                    </button>
-                    <div class="stats-details" id="stats-5">
-                        El control de posesión de Fluminense reduce drásticamente las opciones de ataque del rival, manteniendo marcadores controlados.
-                    </div>
-                </div>
+            <div class="disclaimer-box">
+                <strong>Gestión:</strong> Destina 2%-3% de tu capital por jugada. La estadística respalda, la pelota decide.
             </div>
 
         </div>
 
-        <!-- AVISO DE GESTIÓN -->
-        <div class="disclaimer-box">
-            <strong>Gestión:</strong> Destina 2%-3% de tu capital por jugada. La estadística respalda, la pelota decide.
+        <!-- VISTA VIP EXCLUSIVA (SE ACTIVA AL HACER CLIC EN EL BANNER) -->
+        <div id="vipView">
+            
+            <div class="vip-view-header">
+                <span class="vip-view-title">👑 Pronósticos VIP de Élite</span>
+                <button class="back-to-feed-btn" onclick="switchToGeneral()">← Volver al Feed</button>
+            </div>
+
+            <div class="picks-grid">
+                
+                <!-- Pick VIP 1 -->
+                <div class="pick-card-vip" id="vip-card-1">
+                    <div class="pick-header">
+                        <div class="match-info">
+                            <span class="match-meta" style="color: var(--neon-gold);">⭐ Alta Gama • Prob. 82%</span>
+                            <span class="match-teams">Bayern vs Dortmund</span>
+                        </div>
+                        <div class="unlock-action-vip" onclick="unlockVip(1)">
+                            <span class="odd-hint" style="color: #bfa143;">Cta: 2.10</span>
+                            <span class="credit-cost-vip">💎 4 Cr.</span>
+                        </div>
+                    </div>
+                    <div class="unlocked-content-vip" id="vip-content-1">
+                        <div class="pick-result-text-vip">
+                            <span>🎯 Pick VIP: Ambos anotan + Más de 2.5 Goles</span>
+                        </div>
+                        <button class="stats-accordion-btn-vip" onclick="toggleVipStats(1)">
+                            <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
+                        </button>
+                        <div class="stats-details" id="vip-stats-1">
+                            Los clásicos recientes promedian 3.8 goles por partido con una tendencia del 95% en BTTS.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pick VIP 2 -->
+                <div class="pick-card-vip" id="vip-card-2">
+                    <div class="pick-header">
+                        <div class="match-info">
+                            <span class="match-meta" style="color: var(--neon-gold);">⭐ Alta Gama • Prob. 79%</span>
+                            <span class="match-teams">Napoli vs Inter</span>
+                        </div>
+                        <div class="unlock-action-vip" onclick="unlockVip(2)">
+                            <span class="odd-hint" style="color: #bfa143;">Cta: 1.95</span>
+                            <span class="credit-cost-vip">💎 3 Cr.</span>
+                        </div>
+                    </div>
+                    <div class="unlocked-content-vip" id="vip-content-2">
+                        <div class="pick-result-text-vip">
+                            <span>🎯 Pick VIP: Inter o Empate + Menos de 3.5 Goles</span>
+                        </div>
+                        <button class="stats-accordion-btn-vip" onclick="toggleVipStats(2)">
+                            <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
+                        </button>
+                        <div class="stats-details" id="vip-stats-2">
+                            Solidez táctica defensiva en duelos directos por la punta del campeonato.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="disclaimer-box" style="border-left-color: var(--neon-gold);">
+                <strong>Zona VIP:</strong> Selecciones de alto valor con cuotas superiores a 1.85. Analizadas minuciosamente.
+            </div>
+
         </div>
 
     </div>
 
-    <!-- SCRIPT DE INTERACTIVIDAD (Desbloqueo y Estadísticas) -->
+    <!-- SCRIPT DE INTERACTIVIDAD Y CAMBIO DE VISTAS -->
     <script>
+        function switchToVip() {
+            document.getElementById('generalView').style.display = 'none';
+            document.getElementById('vipView').style.display = 'flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function switchToGeneral() {
+            document.getElementById('vipView').style.display = 'none';
+            document.getElementById('generalView').style.display = 'flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function unlockPick(id) {
             const card = document.getElementById('card-' + id);
-            const actionBtn = card.querySelector('.unlock-action');
-            const content = document.getElementById('content-' + id);
-
-            // Simulamos el pago y desbloqueo visual al instante
-            actionBtn.style.display = 'none'; // Oculta el botón del diamante
-            content.classList.add('show');    // Muestra el pick revelado
+            card.querySelector('.unlock-action').style.display = 'none';
+            document.getElementById('content-' + id).classList.add('show');
         }
 
         function toggleStats(id) {
-            const stats = document.getElementById('stats-' + id);
-            stats.classList.toggle('show');
+            document.getElementById('stats-' + id).classList.toggle('show');
+        }
+
+        function unlockVip(id) {
+            const card = document.getElementById('vip-card-' + id);
+            card.querySelector('.unlock-action-vip').style.display = 'none';
+            document.getElementById('vip-content-' + id).classList.add('show');
+        }
+
+        function toggleVipStats(id) {
+            document.getElementById('vip-stats-' + id).classList.toggle('show');
         }
     </script>
 
