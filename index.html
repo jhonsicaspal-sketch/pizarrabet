@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Pizarra Bet - Panel Principal</title>
+    <title>La Pizarra Bet - Pronósticos Deportivos</title>
     <!-- Librería de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,63 +11,64 @@
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
 
     <!-- HEADER / NAVEGACIÓN -->
-    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
-        <h1 class="text-xl font-bold tracking-wider text-emerald-400">⚽ LA PIZARRA BET</h1>
-        <div class="flex items-center gap-4">
-            <span id="userCreditsDisplay" class="bg-slate-700 px-3 py-1 rounded-full text-sm font-semibold">Créditos: --</span>
-            <button id="adminBtn" onclick="toggleAdminView()" class="hidden bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded transition text-sm">Panel Master</button>
-            <button id="authModalBtn" onclick="openAuthModal()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded transition text-sm">Iniciar Sesión</button>
-            <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-500 hover:bg-rose-600 text-white font-bold px-4 py-2 rounded transition text-sm">Salir</button>
+    <header class="bg-slate-800 border-b border-slate-700 px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-3">
+        <h1 class="text-lg sm:text-xl font-bold tracking-wider text-emerald-400">⚽ LA PIZARRA BET</h1>
+        <div class="flex items-center gap-2 sm:gap-4 flex-wrap">
+            <span id="userCreditsDisplay" class="bg-slate-700 px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">Créditos: --</span>
+            <button id="adminBtn" onclick="toggleAdminView()" class="hidden bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded transition text-xs sm:text-sm">Panel Master</button>
+            <button id="authModalBtn" onclick="openAuthModal()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-3 py-1.5 rounded transition text-xs sm:text-sm">Iniciar Sesión</button>
+            <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-500 hover:bg-rose-600 text-white font-bold px-3 py-1.5 rounded transition text-xs sm:text-sm">Salir</button>
         </div>
     </header>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="flex-1 p-6 max-w-6xl mx-auto w-full">
+    <main class="flex-1 p-4 sm:p-6 max-w-6xl mx-auto w-full">
         <!-- VISTA GENERAL (PICKS) -->
         <div id="generalView">
-            <h2 class="text-2xl font-bold mb-4">Pronósticos del Fin de Semana</h2>
-            <div id="picksContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Los picks se cargan aquí dinámicamente -->
+            <h2 class="text-xl sm:text-2xl font-bold mb-4">Pronósticos del Fin de Semana</h2>
+            <div id="picksContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <p class="text-slate-400">Cargando pronósticos...</p>
             </div>
         </div>
 
         <!-- VISTA ADMIN / MASTER (OCULTA POR DEFECTO) -->
-        <div id="adminView" class="hidden flex-col gap-4 bg-slate-800 p-6 rounded-lg border border-slate-700">
-            <h2 class="text-2xl font-bold text-amber-400">Panel Master - Crear Nuevo Pick</h2>
+        <div id="adminView" class="hidden flex-col gap-4 bg-slate-800 p-4 sm:p-6 rounded-lg border border-slate-700">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl sm:text-2xl font-bold text-amber-400">Panel Master - Crear Nuevo Pick</h2>
+                <button onclick="toggleAdminView()" class="text-slate-400 hover:text-white font-bold">✕ Volver</button>
+            </div>
             <form id="createPickForm" onsubmit="handleCreatePick(event)" class="flex flex-col gap-3">
-                <input type="text" id="pickSection" placeholder="Sección (Ej: Fichajes / Estelar)" class="p-2 rounded bg-slate-900 border border-slate-700 text-white" required>
-                <input type="text" id="pickTeams" placeholder="Equipos (Ej: Real Madrid vs Barcelona)" class="p-2 rounded bg-slate-900 border border-slate-700 text-white" required>
-                <input type="text" id="pickProb" placeholder="Probabilidad (Ej: 65%)" class="p-2 rounded bg-slate-900 border border-slate-700 text-white" required>
-                <input type="text" id="pickOdd" placeholder="Cuota / Odd (Ej: 1.85)" class="p-2 rounded bg-slate-900 border border-slate-700 text-white" required>
-                <input type="number" id="pickCost" placeholder="Costo en Créditos (Ej: 2)" class="p-2 rounded bg-slate-900 border border-slate-700 text-white" required>
-                <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold p-2 rounded transition">Publicar Pick</button>
+                <input type="text" id="pickSection" placeholder="Sección (Ej: Fichajes / Estelar)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-sm" required>
+                <input type="text" id="pickTeams" placeholder="Equipos (Ej: Real Madrid vs Barcelona)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-sm" required>
+                <input type="text" id="pickProb" placeholder="Probabilidad (Ej: 65%)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-sm" required>
+                <input type="text" id="pickOdd" placeholder="Cuota / Odd (Ej: 1.85)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-sm" required>
+                <input type="number" id="pickCost" placeholder="Costo en Créditos (Ej: 2)" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-sm" required>
+                <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold p-3 rounded transition text-sm">Publicar Pick</button>
             </form>
         </div>
     </main>
 
     <!-- MODAL DE AUTENTICACIÓN (LOGIN / REGISTRO) -->
     <div id="authModal" class="fixed inset-0 bg-slate-950/80 hidden flex justify-center items-center z-50 p-4">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg w-full max-w-md relative">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg w-full max-w-md relative shadow-xl">
             <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold">✕</button>
             <div class="flex mb-4 border-b border-slate-700">
-                <button onclick="switchTab('login')" id="tabLoginBtn" class="flex-1 pb-2 font-bold border-b-2 border-emerald-500 text-emerald-400">Iniciar Sesión</button>
-                <button onclick="switchTab('register')" id="tabRegisterBtn" class="flex-1 pb-2 font-bold text-slate-400">Registrarse</button>
+                <button onclick="switchTab('login')" id="tabLoginBtn" class="flex-1 pb-2 font-bold border-b-2 border-emerald-500 text-emerald-400 text-sm">Iniciar Sesión</button>
+                <button onclick="switchTab('register')" id="tabRegisterBtn" class="flex-1 pb-2 font-bold text-slate-400 text-sm">Registrarse</button>
             </div>
             
             <form id="authForm" onsubmit="handleAuthSubmit(event)" class="flex flex-col gap-4">
-                <input type="email" id="authEmail" placeholder="Correo electrónico" class="p-3 rounded bg-slate-900 border border-slate-700 text-white" required>
-                <input type="password" id="authPassword" placeholder="Contraseña" class="p-3 rounded bg-slate-900 border border-slate-700 text-white" required>
-                <button type="submit" id="authSubmitBtn" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded transition">Ingresar</button>
+                <input type="email" id="authEmail" placeholder="Correo electrónico" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-sm" required>
+                <input type="password" id="authPassword" placeholder="Contraseña" class="p-3 rounded bg-slate-900 border border-slate-700 text-white text-sm" required>
+                <button type="submit" id="authSubmitBtn" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded transition text-sm">Ingresar</button>
             </form>
         </div>
     </div>
 
     <!-- SCRIPT DE CONEXIÓN Y LÓGICA -->
     <script>
-        // Configuración de Supabase con tus credenciales
         const SUPABASE_URL = 'https://grqoeyhrejzdsbbonjqk.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_DMZGeBoSDSz26jQoS3SiA_CVxP5...'; // (Asegúrate de pegar aquí tu llave completa de Supabase si hace falta)
+        const SUPABASE_KEY = 'sb_publishable_DMZGeboSDss26jQoSO3SiA_CVxP51Wy';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let isRegisterMode = false;
@@ -115,12 +116,12 @@
             const submitBtn = document.getElementById('authSubmitBtn');
 
             if (isRegisterMode) {
-                registerBtn.className = "flex-1 pb-2 font-bold border-b-2 border-emerald-500 text-emerald-400";
-                loginBtn.className = "flex-1 pb-2 font-bold text-slate-400";
+                registerBtn.className = "flex-1 pb-2 font-bold border-b-2 border-emerald-500 text-emerald-400 text-sm";
+                loginBtn.className = "flex-1 pb-2 font-bold text-slate-400 text-sm";
                 submitBtn.innerText = "Crear Cuenta (10 Créditos Gratis)";
             } else {
-                loginBtn.className = "flex-1 pb-2 font-bold border-b-2 border-emerald-500 text-emerald-400";
-                registerBtn.className = "flex-1 pb-2 font-bold text-slate-400";
+                loginBtn.className = "flex-1 pb-2 font-bold border-b-2 border-emerald-500 text-emerald-400 text-sm";
+                registerBtn.className = "flex-1 pb-2 font-bold text-slate-400 text-sm";
                 submitBtn.innerText = "Ingresar";
             }
         }
@@ -196,10 +197,10 @@
             }
 
             container.innerHTML = data.map(pick => `
-                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex flex-col gap-2">
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex flex-col gap-2 shadow-md">
                     <span class="text-xs uppercase bg-emerald-500/20 text-emerald-400 font-bold px-2 py-1 rounded w-fit">${pick.section}</span>
-                    <h3 class="font-bold text-lg">${pick.teams}</h3>
-                    <div class="flex justify-between text-sm text-slate-300">
+                    <h3 class="font-bold text-base sm:text-lg">${pick.teams}</h3>
+                    <div class="flex justify-between text-xs sm:text-sm text-slate-300">
                         <span>Prob: <b>${pick.prob}</b></span>
                         <span>Cuota: <b>${pick.odd}</b></span>
                     </div>
