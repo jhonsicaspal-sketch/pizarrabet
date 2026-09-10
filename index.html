@@ -3,865 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Pizarra Bet | La estadística respalda, la pelota decide</title>
-    <style>
-        :root {
-            --bg-dark: #07090e;
-            --card-bg: #111622;
-            --card-border: #1e2638;
-            --neon-green: #00ff88;
-            --neon-blue: #00d9ff;
-            --neon-gold: #ffb700;
-            --neon-red: #ff3366;
-            --text-main: #ffffff;
-            --text-muted: #8b9bb4;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        header {
-            background-color: var(--card-bg);
-            border-bottom: 2px solid var(--card-border);
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-circle {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 2px solid var(--neon-green);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
-            background-color: #000;
-            flex-shrink: 0;
-        }
-
-        .logo-circle img {
-            width: 90%;
-            height: 90%;
-            object-fit: contain;
-        }
-
-        .brand-text h1 {
-            font-size: 16px;
-            color: var(--neon-green);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
-        }
-
-        .brand-text p {
-            font-size: 9px;
-            color: var(--neon-blue);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .header-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-credits {
-            background-color: #161f33;
-            border: 1px solid var(--neon-green);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--neon-green);
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
-        }
-
-        .admin-toggle-btn {
-            background-color: rgba(0, 217, 255, 0.1);
-            border: 1px solid var(--neon-blue);
-            color: var(--neon-blue);
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .admin-toggle-btn:hover {
-            background-color: rgba(0, 217, 255, 0.2);
-            box-shadow: 0 0 8px rgba(0, 217, 255, 0.3);
-        }
-
-        .main-layout {
-            max-width: 900px;
-            margin: 15px auto;
-            padding: 0 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-        }
-
-        /* BANNER ANUNCIADOR VIP EN EL FEED GENERAL */
-        .vip-banner-box {
-            background: linear-gradient(135deg, #1f1807 0%, #2b2005 100%);
-            border: 2px solid var(--neon-gold);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(255, 183, 0, 0.25);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .vip-banner-box:hover {
-            transform: scale(1.01);
-        }
-
-        .vip-badge-top {
-            display: inline-block;
-            background-color: rgba(255, 183, 0, 0.15);
-            color: var(--neon-gold);
-            font-size: 9px;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            border: 1px solid var(--neon-gold);
-        }
-
-        .vip-banner-box h2 {
-            font-size: 15px;
-            margin-bottom: 4px;
-            color: var(--text-main);
-        }
-
-        .vip-banner-box h2 span {
-            color: var(--neon-gold);
-        }
-
-        .vip-banner-box p {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-
-        .vip-action-hint {
-            background-color: rgba(255, 183, 0, 0.2);
-            border: 1px dashed var(--neon-gold);
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 11px;
-            color: var(--neon-gold);
-            font-weight: bold;
-        }
-
-        /* VISTA VIP EXCLUSIVA */
-        #vipView {
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .vip-view-header {
-            background: linear-gradient(135deg, #2b2005 0%, #1f1807 100%);
-            border: 1px solid var(--neon-gold);
-            padding: 12px 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .vip-view-title {
-            font-size: 15px;
-            font-weight: bold;
-            color: var(--neon-gold);
-            text-transform: uppercase;
-        }
-
-        .back-to-feed-btn-bottom {
-            background-color: rgba(255, 183, 0, 0.15);
-            border: 1px solid var(--neon-gold);
-            color: var(--neon-gold);
-            font-size: 12px;
-            font-weight: bold;
-            padding: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: center;
-            transition: background 0.2s;
-            box-shadow: 0 0 10px rgba(255, 183, 0, 0.15);
-        }
-        .back-to-feed-btn-bottom:hover {
-            background-color: rgba(255, 183, 0, 0.25);
-        }
-
-        /* VISTA PANEL DE CONTROL (ADMIN) */
-        #adminView {
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .admin-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--neon-blue);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 15px rgba(0, 217, 255, 0.15);
-        }
-
-        .admin-title {
-            font-size: 16px;
-            color: var(--neon-blue);
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .form-group label {
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .form-control {
-            background-color: #07090e;
-            border: 1px solid var(--card-border);
-            padding: 10px;
-            border-radius: 8px;
-            color: var(--text-main);
-            font-size: 13px;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--neon-blue);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
-        .form-row .form-group {
-            flex: 1;
-        }
-
-        .btn-publish {
-            background: linear-gradient(135deg, #00d9ff 0%, #0088ff 100%);
-            color: #000;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(0, 217, 255, 0.4);
-            transition: opacity 0.2s;
-        }
-        .btn-publish:hover {
-            opacity: 0.9;
-        }
-
-        .btn-danger-reset {
-            background-color: rgba(255, 51, 102, 0.15);
-            border: 1px solid var(--neon-red);
-            color: var(--neon-red);
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            width: 100%;
-        }
-
-        /* TARJETAS VIP Y GENERALES */
-        .pick-card-vip {
-            background-color: var(--card-bg);
-            border: 1px solid #3a2e0c;
-            border-radius: 10px;
-            padding: 12px 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .pick-card-vip.unlocked-pulse {
-            border-color: var(--neon-gold);
-            box-shadow: 0 0 15px rgba(255, 183, 0, 0.4);
-        }
-
-        .unlock-action-vip {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: #211904;
-            border: 1px solid #4a3a0e;
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .unlock-action-vip:hover {
-            border-color: var(--neon-gold);
-            box-shadow: 0 0 8px rgba(255, 183, 0, 0.3);
-        }
-
-        .credit-cost-vip {
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--neon-gold);
-        }
-
-        .unlocked-content-vip {
-            display: none;
-            background-color: rgba(255, 183, 0, 0.05);
-            border: 1px dashed var(--neon-gold);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 4px;
-            flex-direction: column;
-            gap: 6px;
-            animation: fadeInContent 0.4s ease-in-out;
-        }
-        .unlocked-content-vip.show {
-            display: flex;
-        }
-
-        .pick-result-text-vip {
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--neon-gold);
-        }
-
-        .stats-accordion-btn-vip {
-            background: none;
-            border: none;
-            color: #ffcc4d;
-            font-size: 11px;
-            cursor: pointer;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 2px 0;
-        }
-
-        .stats-details-vip {
-            display: none;
-            font-size: 11px;
-            color: var(--text-muted);
-            background-color: rgba(0, 0, 0, 0.4);
-            padding: 8px;
-            border-radius: 6px;
-            border-left: 2px solid var(--neon-gold);
-            line-height: 1.4;
-        }
-        .stats-details-vip.show {
-            display: block;
-        }
-
-        #generalView {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .picks-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .pick-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            padding: 12px 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-        .pick-card.unlocked-pulse {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
-        }
-
-        .pick-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .match-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .match-meta {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        .match-teams {
-            font-size: 14px;
-            font-weight: bold;
-            color: var(--text-main);
-        }
-
-        .unlock-action {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: #161f33;
-            border: 1px solid var(--card-border);
-            padding: 6px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .unlock-action:hover {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
-        }
-
-        .credit-cost {
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--neon-green);
-        }
-
-        .odd-hint {
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        .unlocked-content {
-            display: none;
-            background-color: rgba(0, 255, 136, 0.05);
-            border: 1px dashed var(--neon-green);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 4px;
-            flex-direction: column;
-            gap: 6px;
-            animation: fadeInContent 0.4s ease-in-out;
-        }
-        .unlocked-content.show {
-            display: flex;
-        }
-
-        @keyframes fadeInContent {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .pick-result-text {
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--neon-green);
-        }
-
-        .stats-accordion-btn {
-            background: none;
-            border: none;
-            color: var(--neon-blue);
-            font-size: 11px;
-            cursor: pointer;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 2px 0;
-        }
-
-        .stats-details {
-            display: none;
-            font-size: 11px;
-            color: var(--text-muted);
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 8px;
-            border-radius: 6px;
-            border-left: 2px solid var(--neon-blue);
-            line-height: 1.4;
-        }
-        .stats-details.show {
-            display: block;
-        }
-
-        .disclaimer-box {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-left: 3px solid var(--neon-blue);
-            border-radius: 8px;
-            padding: 10px 12px;
-            font-size: 10px;
-            color: var(--text-muted);
-            line-height: 1.4;
-            margin-top: 5px;
-        }
-        .disclaimer-box strong {
-            color: var(--text-main);
-        }
-    </style>
+    <title>La Pizarra Bet - Panel Principal</title>
+    <!-- Librería de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
 
-    <header>
-        <div class="logo-container" style="cursor: pointer;" onclick="switchView('general')">
-            <div class="logo-circle">
-                <img src="logopb.png" alt="La Pizarra Bet Logo">
-            </div>
-            <div class="brand-text">
-                <h1>PizarraBet</h1>
-                <p>La estadística respalda</p>
-            </div>
-        </div>
-        <div class="header-controls">
-            <button class="admin-toggle-btn" id="adminToggleBtn" onclick="toggleAdminView()">⚙️ Panel Admin</button>
-            <div class="user-credits" id="userCreditsDisplay">
-                💎 10 Cr.
-            </div>
+    <!-- HEADER / NAVEGACIÓN -->
+    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold tracking-wider text-emerald-400">⚽ LA PIZARRA BET</h1>
+        <div class="flex items-center gap-4">
+            <span id="userCreditsDisplay" class="bg-slate-700 px-3 py-1 rounded-full text-sm font-semibold">Créditos: --</span>
+            <button id="adminBtn" onclick="toggleAdminView()" class="hidden bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded transition text-sm">Panel Master</button>
+            <button id="authModalBtn" onclick="openAuthModal()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded transition text-sm">Iniciar Sesión</button>
+            <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-rose-500 hover:bg-rose-600 text-white font-bold px-4 py-2 rounded transition text-sm">Salir</button>
         </div>
     </header>
 
-    <div class="main-layout">
-        
-        <!-- VISTA GENERAL (FEED PRINCIPAL) -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 p-6 max-w-6xl mx-auto w-full">
+        <!-- VISTA GENERAL (PICKS) -->
         <div id="generalView">
+            <h2 class="text-2xl font-bold mb-4">Pronósticos del Fin de Semana</h2>
+            <div id="picksContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Los picks se cargan aquí dinámicamente -->
+                <p class="text-slate-400">Cargando pronósticos...</p>
+            </div>
+        </div>
+
+        <!-- VISTA ADMIN / MASTER (OCULTA POR DEFECTO) -->
+        <div id="adminView" class="hidden flex-col gap-4 bg-slate-800 p-6 rounded-lg border border-slate-700">
+            <h2 class="text-2xl font-bold text-amber-400">Panel Master - Crear Nuevo Pick</h2>
+            <form id="createPickForm" onsubmit="handleCreatePick(event)" class="flex flex-col gap-3">
+                <input type="text" id="pickSection" placeholder="Sección (Ej: Fichajes / Estelar)" class="p-2 rounded bg-slate-900 border border-slate-700 text-white" required>
+                <input type="text" id="pickTeams" placeholder="Equipos (Ej: Real Madrid vs Barcelona)" class="p-2 rounded bg-slate-900 border border-slate-700 text-white" required>
+                <input type="text" id="pickProb" placeholder="Probabilidad (Ej: 65%)" class="p-2 rounded bg-slate-900 border border-slate-700 text-white" required>
+                <input type="text" id="pickOdd" placeholder="Cuota / Odd (Ej: 1.85)" class="p-2 rounded bg-slate-900 border border-slate-700 text-white" required>
+                <input type="number" id="pickCost" placeholder="Costo en Créditos (Ej: 2)" class="p-2 rounded bg-slate-900 border border-slate-700 text-white" required>
+                <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold p-2 rounded transition">Publicar Pick</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- MODAL DE AUTENTICACIÓN (LOGIN / REGISTRO) -->
+    <div id="authModal" class="fixed inset-0 bg-slate-950/80 hidden flex justify-center items-center z-50 p-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg w-full max-w-md relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold">✕</button>
+            <div class="flex mb-4 border-b border-slate-700">
+                <button onclick="switchTab('login')" id="tabLoginBtn" class="flex-1 pb-2 font-bold border-b-2 border-emerald-500 text-emerald-400">Iniciar Sesión</button>
+                <button onclick="switchTab('register')" id="tabRegisterBtn" class="flex-1 pb-2 font-bold text-slate-400">Registrarse</button>
+            </div>
             
-            <!-- BANNER ANUNCIADOR VIP -->
-            <div class="vip-banner-box" onclick="switchView('vip')">
-                <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
-                <h2>PRONÓSTICOS VIP: <span>CUOTAS 1.85+</span></h2>
-                <p>Entra aquí para ver selecciones protegidas de alto valor analítico.</p>
-                <div class="vip-action-hint">
-                    ✨ Acceder a la Zona VIP (Mayor valor)
-                </div>
-            </div>
-
-            <!-- CONTENEDOR DINÁMICO DE PICKS GENERALES -->
-            <div class="picks-grid" id="generalPicksContainer">
-                <!-- Se inyectan por JS -->
-            </div>
-
-            <div class="disclaimer-box">
-                <strong>Gestión:</strong> Destina 2%-3% de tu capital por jugada. La estadística respalda, la pelota decide.
-            </div>
-
+            <form id="authForm" onsubmit="handleAuthSubmit(event)" class="flex flex-col gap-4">
+                <input type="email" id="authEmail" placeholder="Correo electrónico" class="p-3 rounded bg-slate-900 border border-slate-700 text-white" required>
+                <input type="password" id="authPassword" placeholder="Contraseña" class="p-3 rounded bg-slate-900 border border-slate-700 text-white" required>
+                <button type="submit" id="authSubmitBtn" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold p-3 rounded transition">Ingresar</button>
+            </form>
         </div>
-
-        <!-- VISTA VIP EXCLUSIVA -->
-        <div id="vipView">
-            
-            <div class="vip-view-header">
-                <span class="vip-view-title">👑 Pronósticos VIP de Élite</span>
-            </div>
-
-            <!-- CONTENEDOR DINÁMICO DE PICKS VIP -->
-            <div class="picks-grid" id="vipPicksContainer">
-                <!-- Se inyectan por JS -->
-            </div>
-
-            <div class="back-to-feed-btn-bottom" onclick="switchView('general')">
-                ← Volver al Feed General
-            </div>
-
-            <div class="disclaimer-box" style="border-left-color: var(--neon-gold);">
-                <strong>Zona VIP:</strong> Selecciones de alto valor con cuotas superiores a 1.85. Analizadas minuciosamente.
-            </div>
-
-        </div>
-
-        <!-- VISTA PANEL DE CONTROL (ADMIN) -->
-        <div id="adminView">
-            <div class="admin-card">
-                <div class="admin-title">🛠️ Carga y Gestión de Pronósticos</div>
-                
-                <form id="adminPickForm" onsubmit="handleCreatePick(event)">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Sección destino</label>
-                            <select id="pickSection" class="form-control">
-                                <option value="general">Feed General</option>
-                                <option value="vip">Zona VIP 🌟</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Costo en Créditos (💎)</label>
-                            <input type="number" id="pickCost" class="form-control" min="1" max="100" value="2" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Equipos / Partido</label>
-                            <input type="text" id="pickTeams" class="form-control" placeholder="Ej: Barcelona vs Real Madrid" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Probabilidad (%)</label>
-                            <input type="text" id="pickProb" class="form-control" placeholder="Ej: 88%" value="85%" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Cuota (Odd)</label>
-                            <input type="text" id="pickOdd" class="form-control" placeholder="Ej: 1.45" value="1.50" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Fecha / Meta</label>
-                            <input type="text" id="pickMeta" class="form-control" value="📅 Hoy • Análisis Táctico" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Pronóstico (Pick exacto)</label>
-                        <input type="text" id="pickResult" class="form-control" placeholder="Ej: Victoria local + Más de 1.5 goles" required>
-                    </div>
-
-                    <!-- AQUÍ ESTÁ LA CASILLA PARA EDITAR Y MONTAR TU TEXTO DE RESPALDO -->
-                    <div class="form-group">
-                        <label>📊 Respaldo Estadístico (Escribe aquí tu análisis detallado)</label>
-                        <textarea id="pickStats" class="form-control" rows="4" placeholder="Escribe aquí las métricas, rachas, xG o datos históricos que respaldan tu pick..." required>📈 Respaldo Táctico: [Escribe aquí tu análisis detallado sobre posesión, xG, rendimiento de local/visitante o rachas recientes de los equipos...]</textarea>
-                    </div>
-
-                    <button type="submit" class="btn-publish">🚀 Publicar Nuevo Pronóstico</button>
-                </form>
-
-                <button class="btn-danger-reset" onclick="resetDefaultPicks()">🔄 Restaurar Picks Iniciales</button>
-            </div>
-
-            <div class="back-to-feed-btn-bottom" onclick="switchView('general')">
-                ← Volver al Feed de Usuario
-            </div>
-        </div>
-
     </div>
 
+    <!-- SCRIPT DE CONEXIÓN Y LÓGICA -->
     <script>
-        // DATOS INICIALES DE PRUEBA
-        const defaultPicks = [
-            { id: 'gen-1', section: 'general', teams: 'Wrexham vs [Rival]', prob: '88%', odd: '1.35', cost: 1, meta: '📅 Hoy', result: 'Wrexham o Empate (Doble Oportunidad)', stats: '📈 Respaldo Táctico: Control absoluto de localía con un 91% de efectividad sumando puntos en sus últimos 12 partidos oficiales. Promedio de posesión superior al 58%.' },
-            { id: 'gen-2', section: 'general', teams: 'Real Madrid vs [Rival]', prob: '85%', odd: '1.40', cost: 2, meta: '📅 Hoy', result: 'Más de 1.5 Goles en el partido', stats: '📈 Respaldo Táctico: El equipo local cumple con la línea de 1.5 goles en el 92% de sus partidos disputados en casa esta temporada.' },
-            { id: 'vip-1', section: 'vip', teams: 'Bayern vs Dortmund', prob: '82%', odd: '2.10', cost: 4, meta: '⭐ Alta Gama VIP', result: 'Ambos anotan + Más de 2.5 Goles', stats: '🌟 Respaldo Estadístico Élite: Los duelos directos recientes promedian 3.8 goles por partido con tendencia de BTTS activa en el 85% de sus cruces.' },
-            { id: 'vip-2', section: 'vip', teams: 'Napoli vs Inter', prob: '79%', odd: '1.95', cost: 3, meta: '⭐ Alta Gama VIP', result: 'Inter o Empate + Menos de 3.5 Goles', stats: '🌟 Respaldo Estadístico Élite: Solidez defensiva del visitante registrando el 70% de sus salidas sin encajar más de un tanto.' }
-        ];
+        // Configuración de Supabase con tus credenciales
+        const SUPABASE_URL = 'https://grqoeyhrejzdsbbonjqk.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_DMZGeBoSDSz26jQoS3SiA_CVxP5...'; // (Asegúrate de pegar aquí tu llave completa de Supabase si hace falta)
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentCredits = localStorage.getItem('pb_credits') !== null ? parseInt(localStorage.getItem('pb_credits')) : 10;
-        let unlockedPicks = JSON.parse(localStorage.getItem('pb_unlocked')) || {};
-        let allPicks = JSON.parse(localStorage.getItem('pb_all_picks')) || defaultPicks;
+        let isRegisterMode = false;
+        let currentUser = null;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            updateCreditsUI();
-            renderPicks();
-            restaurarPicksDesbloqueados();
+        document.addEventListener("DOMContentLoaded", async () => {
+            await checkUserSession();
+            loadPicks();
         });
 
-        function updateCreditsUI() {
-            document.getElementById('userCreditsDisplay').innerText = `💎 ${currentCredits} Cr.`;
-            localStorage.setItem('pb_credits', currentCredits);
+        async function checkUserSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                document.getElementById('authModalBtn').classList.add('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                await fetchUserProfile(currentUser.id);
+            } else {
+                document.getElementById('userCreditsDisplay').innerText = 'Inicia sesión';
+            }
         }
 
-        function switchView(viewName) {
-            document.getElementById('generalView').style.display = viewName === 'general' ? 'flex' : 'none';
-            document.getElementById('vipView').style.display = viewName === 'vip' ? 'flex' : 'none';
-            document.getElementById('adminView').style.display = viewName === 'admin' ? 'flex' : 'none';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        async function fetchUserProfile(userId) {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (data) {
+                document.getElementById('userCreditsDisplay').innerText = `Créditos: ${data.credits}`;
+                if (data.role === 'master') {
+                    document.getElementById('adminBtn').classList.remove('hidden');
+                }
+            }
+        }
+
+        function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+
+        function switchTab(tab) {
+            isRegisterMode = (tab === 'register');
+            const loginBtn = document.getElementById('tabLoginBtn');
+            const registerBtn = document.getElementById('tabRegisterBtn');
+            const submitBtn = document.getElementById('authSubmitBtn');
+
+            if (isRegisterMode) {
+                registerBtn.className = "flex-1 pb-2 font-bold border-b-2 border-emerald-500 text-emerald-400";
+                loginBtn.className = "flex-1 pb-2 font-bold text-slate-400";
+                submitBtn.innerText = "Crear Cuenta (10 Créditos Gratis)";
+            } else {
+                loginBtn.className = "flex-1 pb-2 font-bold border-b-2 border-emerald-500 text-emerald-400";
+                registerBtn.className = "flex-1 pb-2 font-bold text-slate-400";
+                submitBtn.innerText = "Ingresar";
+            }
+        }
+
+        async function handleAuthSubmit(event) {
+            event.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+
+            if (isRegisterMode) {
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if (error) alert(error.message);
+                else {
+                    alert("¡Registro exitoso! Ya puedes iniciar sesión.");
+                    switchTab('login');
+                }
+            } else {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) alert(error.message);
+                else {
+                    closeAuthModal();
+                    window.location.reload();
+                }
+            }
+        }
+
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            window.location.reload();
         }
 
         function toggleAdminView() {
             const adminView = document.getElementById('adminView');
-            if (adminView.style.display === 'flex') {
-                switchView('general');
+            const generalView = document.getElementById('generalView');
+            if (adminView.classList.contains('hidden')) {
+                adminView.classList.remove('hidden');
+                generalView.classList.add('hidden');
             } else {
-                switchView('admin');
+                adminView.classList.add('hidden');
+                generalView.classList.remove('hidden');
             }
         }
 
-        function renderPicks() {
-            const generalContainer = document.getElementById('generalPicksContainer');
-            const vipContainer = document.getElementById('vipPicksContainer');
-            
-            generalContainer.innerHTML = '';
-            vipContainer.innerHTML = '';
+        async function handleCreatePick(event) {
+            event.preventDefault();
+            const section = document.getElementById('pickSection').value;
+            const teams = document.getElementById('pickTeams').value;
+            const prob = document.getElementById('pickProb').value;
+            const odd = document.getElementById('pickOdd').value;
+            const cost = parseInt(document.getElementById('pickCost').value);
 
-            allPicks.forEach(pick => {
-                if (pick.section === 'general') {
-                    generalContainer.innerHTML += `
-                        <div class="pick-card" id="card-${pick.id}">
-                            <div class="pick-header">
-                                <div class="match-info">
-                                    <span class="match-meta">${pick.meta} • Prob. ${pick.prob}</span>
-                                    <span class="match-teams">${pick.teams}</span>
-                                </div>
-                                <div class="unlock-action" onclick="unlockPick('${pick.id}', ${pick.cost})">
-                                    <span class="odd-hint">Cta: ${pick.odd}</span>
-                                    <span class="credit-cost">💎 ${pick.cost} Cr.</span>
-                                </div>
-                            </div>
-                            <div class="unlocked-content" id="content-${pick.id}">
-                                <div class="pick-result-text">
-                                    <span>🎯 Pick: ${pick.result}</span>
-                                </div>
-                                <button class="stats-accordion-btn" onclick="toggleStats('${pick.id}')">
-                                    <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                                </button>
-                                <div class="stats-details" id="stats-${pick.id}">
-                                    ${pick.stats}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    vipContainer.innerHTML += `
-                        <div class="pick-card-vip" id="card-${pick.id}">
-                            <div class="pick-header">
-                                <div class="match-info">
-                                    <span class="match-meta" style="color: var(--neon-gold);">${pick.meta} • Prob. ${pick.prob}</span>
-                                    <span class="match-teams">${pick.teams}</span>
-                                </div>
-                                <div class="unlock-action-vip" onclick="unlockPick('${pick.id}', ${pick.cost})">
-                                    <span class="odd-hint" style="color: #bfa143;">Cta: ${pick.odd}</span>
-                                    <span class="credit-cost-vip">💎 ${pick.cost} Cr.</span>
-                                </div>
-                            </div>
-                            <div class="unlocked-content-vip" id="content-${pick.id}">
-                                <div class="pick-result-text-vip">
-                                    <span>🎯 Pick VIP: ${pick.result}</span>
-                                </div>
-                                <button class="stats-accordion-btn-vip" onclick="toggleStats('${pick.id}')">
-                                    <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
-                                </button>
-                                <div class="stats-details-vip" id="stats-${pick.id}">
-                                    ${pick.stats}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-        }
+            const { error } = await supabase.from('picks').insert([{
+                section, teams, prob, odd, cost, meta: 'N/A', result: 'Pendiente', stats: 'N/A'
+            }]);
 
-        function handleCreatePick(e) {
-            e.preventDefault();
-
-            const newPick = {
-                id: 'custom-' + Date.now(),
-                section: document.getElementById('pickSection').value,
-                teams: document.getElementById('pickTeams').value,
-                prob: document.getElementById('pickProb').value,
-                odd: document.getElementById('pickOdd').value,
-                cost: parseInt(document.getElementById('pickCost').value),
-                meta: document.getElementById('pickMeta').value,
-                result: document.getElementById('pickResult').value,
-                stats: document.getElementById('pickStats').value // Aquí toma exactamente lo que escribas en la casilla
-            };
-
-            allPicks.unshift(newPick);
-            localStorage.setItem('pb_all_picks', JSON.stringify(allPicks));
-
-            renderPicks();
-            restaurarPicksDesbloqueados();
-            document.getElementById('adminPickForm').reset();
-            
-            alert("¡Pronóstico creado y publicado con éxito con su texto de respaldo!");
-            switchView(newPick.section);
-        }
-
-        function resetDefaultPicks() {
-            if (confirm("¿Estás seguro de restablecer los pronósticos originales? Se borrarán los creados manualmente.")) {
-                allPicks = defaultPicks;
-                localStorage.setItem('pb_all_picks', JSON.stringify(allPicks));
-                localStorage.removeItem('pb_unlocked');
-                unlockedPicks = {};
-                renderPicks();
-                alert("¡Picks restablecidos!");
-                switchView('general');
+            if (error) {
+                alert("Error al publicar: " + error.message);
+            } else {
+                alert("¡Pick publicado con éxito!");
+                document.getElementById('createPickForm').reset();
+                toggleAdminView();
+                loadPicks();
             }
         }
 
-        function unlockPick(id, cost) {
-            if (currentCredits < cost) {
-                let faltantes = cost - currentCredits;
-                alert(`⚠️ ¡Fondo insuficiente!\n\nEste pronóstico cuesta 💎 ${cost} Cr. y tu saldo actual es de 💎 ${currentCredits} Cr.\nTe faltan ${faltantes} créditos para poder desbloquearlo.`);
+        async function loadPicks() {
+            const container = document.getElementById('picksContainer');
+            const { data, error } = await supabase.from('picks').select('*').order('created_at', { ascending: false });
+
+            if (error || !data || data.length === 0) {
+                container.innerHTML = `<p class="text-slate-400">No hay pronósticos publicados aún.</p>`;
                 return;
             }
 
-            currentCredits -= cost;
-            updateCreditsUI();
-
-            unlockedPicks[id] = true;
-            localStorage.setItem('pb_unlocked', JSON.stringify(unlockedPicks));
-
-            desbloquearTarjetaVisual(id);
-        }
-
-        function desbloquearTarjetaVisual(id) {
-            const card = document.getElementById('card-' + id);
-            if (!card) return;
-
-            const isVip = card.classList.contains('pick-card-vip');
-            card.classList.add('unlocked-pulse');
-            
-            const btn = card.querySelector(isVip ? '.unlock-action-vip' : '.unlock-action');
-            if (btn) btn.style.display = 'none';
-            
-            const content = document.getElementById('content-' + id);
-            if (content) content.classList.add('show');
-        }
-
-        function restaurarPicksDesbloqueados() {
-            for (let id in unlockedPicks) {
-                if (unlockedPicks[id]) {
-                    desbloquearTarjetaVisual(id);
-                }
-            }
-        }
-
-        function toggleStats(id) {
-            const stats = document.getElementById('stats-' + id);
-            if (stats) stats.classList.toggle('show');
+            container.innerHTML = data.map(pick => `
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 flex flex-col gap-2">
+                    <span class="text-xs uppercase bg-emerald-500/20 text-emerald-400 font-bold px-2 py-1 rounded w-fit">${pick.section}</span>
+                    <h3 class="font-bold text-lg">${pick.teams}</h3>
+                    <div class="flex justify-between text-sm text-slate-300">
+                        <span>Prob: <b>${pick.prob}</b></span>
+                        <span>Cuota: <b>${pick.odd}</b></span>
+                    </div>
+                </div>
+            `).join('');
         }
     </script>
-
 </body>
 </html>
