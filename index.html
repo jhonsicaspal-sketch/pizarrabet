@@ -165,34 +165,36 @@
         }
 
         .vip-view-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             background: linear-gradient(135deg, #2b2005 0%, #1f1807 100%);
             border: 1px solid var(--neon-gold);
             padding: 12px 15px;
             border-radius: 10px;
+            text-align: center;
         }
 
         .vip-view-title {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: bold;
             color: var(--neon-gold);
             text-transform: uppercase;
         }
 
-        .back-to-feed-btn {
-            background: none;
-            border: 1px solid var(--text-muted);
-            color: var(--text-main);
-            font-size: 11px;
-            padding: 5px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .back-to-feed-btn:hover {
-            border-color: var(--neon-gold);
+        /* BOTÓN DE RETORNO ABAJO (ESTILO ELEGANTE DORADO) */
+        .back-to-feed-btn-bottom {
+            background-color: rgba(255, 183, 0, 0.15);
+            border: 1px solid var(--neon-gold);
             color: var(--neon-gold);
+            font-size: 12px;
+            font-weight: bold;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.2s;
+            box-shadow: 0 0 10px rgba(255, 183, 0, 0.15);
+        }
+        .back-to-feed-btn-bottom:hover {
+            background-color: rgba(255, 183, 0, 0.25);
         }
 
         /* TARJETAS VIP (ESTILO DORADO/ÁMBAR EXCLUSIVO) */
@@ -263,6 +265,20 @@
             align-items: center;
             gap: 5px;
             padding: 2px 0;
+        }
+
+        .stats-details-vip {
+            display: none;
+            font-size: 11px;
+            color: var(--text-muted);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 8px;
+            border-radius: 6px;
+            border-left: 2px solid var(--neon-gold);
+            line-height: 1.4;
+        }
+        .stats-details-vip.show {
+            display: block;
         }
 
         /* GRID DE PICKS GENERALES */
@@ -426,13 +442,13 @@
             <div class="vip-banner-box" onclick="switchToVip()">
                 <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
                 <h2>PRONÓSTICOS VIP: <span>CUOTAS 1.85+</span></h2>
-                <p>Entra aquí para ver 3 selecciones protegidas de alto valor analítico.</p>
+                <p>Entra aquí para ver selecciones protegidas de alto valor analítico.</p>
                 <div class="vip-action-hint">
                     ✨ Acceder a la Zona VIP (Mayor valor)
                 </div>
             </div>
 
-            <!-- LISTA DE PICKS GENERALES (Cuotas <= 1.40, Costo 1-2 Cr.) -->
+            <!-- LISTA DE PICKS GENERALES -->
             <div class="picks-grid">
                 
                 <div class="pick-card" id="card-1">
@@ -491,12 +507,11 @@
 
         </div>
 
-        <!-- VISTA VIP EXCLUSIVA (SE ACTIVA AL HACER CLIC EN EL BANNER) -->
+        <!-- VISTA VIP EXCLUSIVA -->
         <div id="vipView">
             
             <div class="vip-view-header">
                 <span class="vip-view-title">👑 Pronósticos VIP de Élite</span>
-                <button class="back-to-feed-btn" onclick="switchToGeneral()">← Volver al Feed</button>
             </div>
 
             <div class="picks-grid">
@@ -520,7 +535,7 @@
                         <button class="stats-accordion-btn-vip" onclick="toggleVipStats(1)">
                             <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
                         </button>
-                        <div class="stats-details" id="vip-stats-1">
+                        <div class="stats-details-vip" id="vip-stats-1">
                             Los clásicos recientes promedian 3.8 goles por partido con una tendencia del 95% en BTTS.
                         </div>
                     </div>
@@ -545,12 +560,17 @@
                         <button class="stats-accordion-btn-vip" onclick="toggleVipStats(2)">
                             <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
                         </button>
-                        <div class="stats-details" id="vip-stats-2">
+                        <div class="stats-details-vip" id="vip-stats-2">
                             Solidez táctica defensiva en duelos directos por la punta del campeonato.
                         </div>
                     </div>
                 </div>
 
+            </div>
+
+            <!-- BOTÓN DE RETORNO AL FEED (UBICADO ABAJO DE LOS PICKS VIP) -->
+            <div class="back-to-feed-btn-bottom" onclick="switchToGeneral()">
+                ← Volver al Feed General
             </div>
 
             <div class="disclaimer-box" style="border-left-color: var(--neon-gold);">
@@ -561,7 +581,6 @@
 
     </div>
 
-    <!-- SCRIPT DE INTERACTIVIDAD Y CAMBIO DE VISTAS -->
     <script>
         function switchToVip() {
             document.getElementById('generalView').style.display = 'none';
