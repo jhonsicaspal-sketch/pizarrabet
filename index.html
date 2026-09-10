@@ -91,7 +91,6 @@
             font-weight: bold;
             color: var(--neon-green);
             box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
-            cursor: pointer;
         }
 
         .main-layout {
@@ -441,8 +440,7 @@
                 <p>La estadística respalda</p>
             </div>
         </div>
-        <!-- Al hacer clic 3 veces rápidas en los créditos, podemos sumar saldo de prueba para testear -->
-        <div class="user-credits" id="userCreditsDisplay" onclick="agregarCreditosPrueba()" title="Haz clic para recargar créditos de prueba">
+        <div class="user-credits" id="userCreditsDisplay">
             💎 10 Cr.
         </div>
     </header>
@@ -465,7 +463,7 @@
             <!-- LISTA DE PICKS GENERALES -->
             <div class="picks-grid">
                 
-                <!-- Pick de 1 Crédito (Fácil acceso) -->
+                <!-- Pick de 1 Crédito -->
                 <div class="pick-card" id="card-1">
                     <div class="pick-header">
                         <div class="match-info">
@@ -515,7 +513,7 @@
                     </div>
                 </div>
 
-                <!-- PRUEBA DE 20 CRÉDITOS (Bloqueado con saldo inicial de 10) -->
+                <!-- Megapick de 20 Créditos -->
                 <div class="pick-card" id="card-20">
                     <div class="pick-header">
                         <div class="match-info">
@@ -623,7 +621,7 @@
     </div>
 
     <script>
-        // 1. CARGAR DATOS PERSISTENTES O INICIALIZAR EN 10 CRÉDITOS
+        // CARGAR DATOS PERSISTENTES O INICIALIZAR EN 10 CRÉDITOS
         let currentCredits = localStorage.getItem('pb_credits') !== null 
             ? parseInt(localStorage.getItem('pb_credits')) 
             : 10; 
@@ -638,13 +636,6 @@
         function updateCreditsUI() {
             document.getElementById('userCreditsDisplay').innerText = `💎 ${currentCredits} Cr.`;
             localStorage.setItem('pb_credits', currentCredits);
-        }
-
-        // Truco útil para pruebas: haz clic en el botón de créditos de arriba para recargar +10 y probar el de 20
-        function agregarCreditosPrueba() {
-            currentCredits += 10;
-            updateCreditsUI();
-            alert("¡Recarga de prueba exitosa! Se sumaron 10 créditos.");
         }
 
         function switchToVip() {
@@ -684,14 +675,12 @@
 
         // MOTOR DE LÓGICA CONDICIONAL DE BLOQUEO/DESBLOQUEO
         function unlockPick(id, cost) {
-            // CONDICIÓN DE RECHAZO: Saldo insuficiente con cálculo del faltante exacto
             if (currentCredits < cost) {
                 let faltantes = cost - currentCredits;
                 alert(`⚠️ ¡Fondo insuficiente!\n\nEste pronóstico cuesta 💎 ${cost} Cr. y tu saldo actual es de 💎 ${currentCredits} Cr.\nTe faltan ${faltantes} créditos para poder desbloquearlo.`);
-                return; // Detiene la ejecución por completo
+                return;
             }
 
-            // CONDICIÓN DE ÉXITO: Descuento, registro y persistencia local
             currentCredits -= cost;
             updateCreditsUI();
 
@@ -702,7 +691,6 @@
         }
 
         function unlockVip(id, cost) {
-            // CONDICIÓN DE RECHAZO VIP con cálculo exacto
             if (currentCredits < cost) {
                 let faltantes = cost - currentCredits;
                 alert(`⚠️ ¡Fondo insuficiente VIP!\n\nEsta joya cuesta 💎 ${cost} Cr. y tu saldo es de 💎 ${currentCredits} Cr.\nTe faltan ${faltantes} créditos para acceder.`);
