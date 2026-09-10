@@ -47,15 +47,15 @@
         }
 
         .logo-circle {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             border: 2px solid var(--neon-green);
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 12px rgba(0, 255, 136, 0.4);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
             background-color: #000;
             flex-shrink: 0;
         }
@@ -67,7 +67,7 @@
         }
 
         .brand-text h1 {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--neon-green);
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -75,134 +75,60 @@
         }
 
         .brand-text p {
-            font-size: 10px;
+            font-size: 9px;
             color: var(--neon-blue);
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
-        .main-layout {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 15px;
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 25px;
-            width: 100%;
-        }
-
-        /* SIDEBAR / ESCRITORIO */
-        .sidebar {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 20px;
-            height: fit-content;
-        }
-
-        .sidebar h3 {
-            font-size: 14px;
-            color: var(--neon-blue);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--card-border);
-            padding-bottom: 8px;
-        }
-
-        .result-card-mini {
-            background-color: #0b0f17;
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 12px;
-        }
-
-        .result-teams {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4px;
-            font-weight: 600;
-        }
-
-        .result-score {
-            color: var(--neon-green);
-            font-size: 12px;
-        }
-
-        /* ACORDEÓN MÓVIL (RESULTADOS ANTERIORES) */
-        .mobile-accordion {
-            display: none;
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .accordion-header {
-            width: 100%;
+        /* HEADER USER CREDITS */
+        .user-credits {
             background-color: #161f33;
-            color: var(--neon-blue);
-            padding: 14px 18px;
-            text-align: left;
-            border: none;
-            font-size: 14px;
+            border: 1px solid var(--neon-green);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
         }
 
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            padding: 0 15px;
-            background-color: var(--card-bg);
-        }
-
-        .accordion-content.active {
-            max-height: 450px;
-            padding: 15px;
-        }
-
-        .content-area {
+        .main-layout {
+            max-width: 900px;
+            margin: 15px auto;
+            padding: 0 10px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
+            width: 100%;
         }
 
-        /* CAJA VIP EXCLUSIVA (ESTÉTICA NEÓN) */
+        /* CAJA VIP NEÓN COMPACTA */
         .vip-neon-box {
             background: linear-gradient(135deg, #0d1b1e 0%, #112a24 100%);
             border: 2px solid var(--neon-green);
             border-radius: 12px;
-            padding: 22px;
+            padding: 16px;
             text-align: center;
-            box-shadow: 0 0 25px rgba(0, 255, 136, 0.25);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
         }
 
         .vip-badge-top {
             display: inline-block;
             background-color: rgba(0, 255, 136, 0.15);
             color: var(--neon-green);
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 20px;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
             border: 1px solid var(--neon-green);
         }
 
         .vip-neon-box h2 {
-            font-size: 18px;
-            margin-bottom: 8px;
+            font-size: 15px;
+            margin-bottom: 4px;
             color: var(--text-main);
         }
 
@@ -211,195 +137,166 @@
         }
 
         .vip-neon-box p {
-            font-size: 13px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
-        .vip-locked-content {
-            background-color: rgba(0, 0, 0, 0.4);
+        .vip-locked-btn {
+            background-color: rgba(0, 255, 136, 0.2);
             border: 1px dashed var(--neon-green);
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--neon-green);
             font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .vip-locked-btn:hover {
+            background-color: rgba(0, 255, 136, 0.3);
         }
 
-        .hook-box {
-            background: linear-gradient(135deg, #111622 0%, #152238 100%);
-            border: 2px solid var(--neon-blue);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
-        }
-
-        .hook-box h2 {
-            font-size: 18px;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        .hook-box h2 span {
-            color: var(--neon-green);
-        }
-
-        .hook-box p {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .telegram-btn {
-            display: inline-block;
-            background-color: var(--neon-green);
-            color: #000;
-            font-weight: bold;
-            padding: 12px 25px;
-            border-radius: 30px;
-            text-decoration: none;
-            margin-top: 15px;
-            text-transform: uppercase;
-            font-size: 13px;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
-            transition: transform 0.2s;
-        }
-
-        .telegram-btn:hover {
-            transform: scale(1.05);
-        }
-
+        /* GRID DE PICKS COMPACTOS (ESTILO LISTA FLUÍDA) */
         .picks-grid {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
         }
 
         .pick-card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 10px;
+            padding: 12px 15px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
+            flex-direction: column;
+            gap: 8px;
             transition: border-color 0.2s;
         }
 
         .pick-card:hover {
-            border-color: var(--neon-green);
+            border-color: var(--card-border);
+        }
+
+        .pick-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .match-info {
+            display: flex;
+            flex-direction: column;
         }
 
         .match-meta {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
-            margin-bottom: 4px;
         }
 
         .match-teams {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: bold;
+            color: var(--text-main);
         }
 
-        .pick-prediction {
-            background-color: rgba(0, 255, 136, 0.1);
-            border: 1px dashed var(--neon-green);
+        /* BOTÓN DIAMANTE / CRÉDITOS (ESTADO BLOQUEADO) */
+        .unlock-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #161f33;
+            border: 1px solid var(--card-border);
             padding: 6px 12px;
             border-radius: 8px;
-            text-align: center;
-            flex-grow: 1;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .pick-label {
-            font-size: 10px;
-            color: var(--text-muted);
-            display: block;
+        .unlock-action:hover {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
         }
 
-        .pick-value {
-            font-size: 13px;
+        .credit-cost {
+            font-size: 12px;
             font-weight: bold;
             color: var(--neon-green);
         }
 
-        .odd-container {
-            text-align: center;
-            min-width: 70px;
+        .odd-hint {
+            font-size: 10px;
+            color: var(--text-muted);
         }
 
-        .odd-sublabel {
-            font-size: 9px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .odd-badge {
-            background-color: var(--card-border);
-            color: var(--text-muted);
-            font-weight: bold;
-            padding: 6px 12px;
+        /* CONTENIDO DESBLOQUEADO (OCULTO POR DEFECTO) */
+        .unlocked-content {
+            display: none;
+            background-color: rgba(0, 255, 136, 0.05);
+            border: 1px dashed var(--neon-green);
+            padding: 10px;
             border-radius: 8px;
-            font-size: 14px;
-            display: inline-block;
+            margin-top: 4px;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .unlocked-content.show {
+            display: flex;
+        }
+
+        .pick-result-text {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--neon-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-accordion-btn {
+            background: none;
+            border: none;
+            color: var(--neon-blue);
+            font-size: 11px;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 0;
+        }
+
+        .stats-details {
+            display: none;
+            font-size: 11px;
+            color: var(--text-muted);
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 6px;
+            border-left: 2px solid var(--neon-blue);
+            line-height: 1.4;
+        }
+
+        .stats-details.show {
+            display: block;
         }
 
         .disclaimer-box {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-left: 4px solid var(--neon-blue);
+            border-left: 3px solid var(--neon-blue);
             border-radius: 8px;
-            padding: 15px;
-            font-size: 11px;
+            padding: 10px 12px;
+            font-size: 10px;
             color: var(--text-muted);
-            line-height: 1.5;
+            line-height: 1.4;
+            margin-top: 5px;
         }
 
         .disclaimer-box strong {
             color: var(--text-main);
-        }
-
-        /* ADAPTACIÓN MÓVIL (RESPONSIVE) */
-        @media (max-width: 900px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-                margin: 15px auto;
-                padding: 0 10px;
-            }
-            .sidebar {
-                display: none;
-            }
-            .mobile-accordion {
-                display: block;
-            }
-            .pick-card {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-            .pick-prediction {
-                width: 100%;
-            }
-            .odd-container {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background-color: #0b0f17;
-                padding: 8px 12px;
-                border-radius: 8px;
-            }
-            .odd-badge {
-                display: inline-block;
-            }
-        }
-        
-        div[id*="netlify"], iframe[src*="netlify"], a[href*="netlify.com/trust"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
         }
     </style>
 </head>
@@ -412,229 +309,181 @@
             </div>
             <div class="brand-text">
                 <h1>PizarraBet</h1>
-                <p>La estadística respalda, la pelota decide</p>
+                <p>La estadística respalda</p>
             </div>
+        </div>
+        <div class="user-credits">
+            💎 10 Cr.
         </div>
     </header>
 
     <div class="main-layout">
         
-        <!-- COLUMNA IZQUIERDA: RESULTADOS ANTERIORES (Solo PC) -->
-        <aside class="sidebar">
-            <h3>Resultados Ayer</h3>
+        <!-- CAJA VIP NEÓN COMPACTA -->
+        <div class="vip-neon-box">
+            <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
+            <h2>PICK VIP: <span>CUOTA DE ALTO VALOR</span></h2>
+            <p>Análisis avanzado con +85% de probabilidad estimada.</p>
+            <div class="vip-locked-btn" onclick="alert('Sistema de créditos VIP en configuración')">
+                🔒 Desbloquear por 3 Créditos
+            </div>
+        </div>
+
+        <!-- LISTA DE PICKS COMPACTOS (Simulando varios en pantalla) -->
+        <div class="picks-grid" id="picksContainer">
             
-            <div class="result-card-mini">
-                <div class="result-teams">
-                    <span>Bayer Leverkusen</span>
-                    <span class="result-score">4 - 0</span>
-                </div>
-                <div class="match-meta">Acertado ✅</div>
-            </div>
-
-            <div class="result-card-mini">
-                <div class="result-teams">
-                    <span>Hoffenheim vs B. Dortmund</span>
-                    <span class="result-score">2 - 3</span>
-                </div>
-                <div class="match-meta">Acertado ✅</div>
-            </div>
-
-            <div class="result-card-mini">
-                <div class="result-teams">
-                    <span>M. City vs Coventry</span>
-                    <span class="result-score">1 - 0</span>
-                </div>
-                <div class="match-meta">No acertado ❌</div>
-            </div>
-
-            <div class="result-card-mini">
-                <div class="result-teams">
-                    <span>Sporting vs Nacional</span>
-                    <span class="result-score">2 - 0</span>
-                </div>
-                <div class="match-meta">Acertado ✅</div>
-            </div>
-
-            <div class="result-card-mini">
-                <div class="result-teams">
-                    <span>Marítimo vs Benfica</span>
-                    <span class="result-score">0 - 3</span>
-                </div>
-                <div class="match-meta">Acertado ✅</div>
-            </div>
-        </aside>
-
-        <!-- COLUMNA CENTRAL -->
-        <main class="content-area">
-            
-            <!-- ACORDEÓN DESPLEGABLE DE RESULTADOS (Solo Móvil) -->
-            <div class="mobile-accordion">
-                <button class="accordion-header" id="accordionBtn">
-                    <span>📊 Resultados Ayer</span>
-                    <span>▼</span>
-                </button>
-                <div class="accordion-content" id="accordionContent">
-                    <div class="result-card-mini">
-                        <div class="result-teams">
-                            <span>Bayer Leverkusen</span>
-                            <span class="result-score">4 - 0</span>
-                        </div>
-                        <div class="match-meta">Acertado ✅</div>
+            <!-- Tarjeta Pick 1 -->
+            <div class="pick-card" id="card-1">
+                <div class="pick-header">
+                    <div class="match-info">
+                        <span class="match-meta">📅 Hoy • Prob. 72%</span>
+                        <span class="match-teams">Wrexham vs [Rival]</span>
                     </div>
-                    <div class="result-card-mini">
-                        <div class="result-teams">
-                            <span>Hoffenheim vs B. Dortmund</span>
-                            <span class="result-score">2 - 3</span>
-                        </div>
-                        <div class="match-meta">Acertado ✅</div>
+                    <!-- Botón de Bloqueo con Diamante y Costo -->
+                    <div class="unlock-action" onclick="unlockPick(1)">
+                        <span class="odd-hint">Cta: 1.75</span>
+                        <span class="credit-cost">💎 1 Cr.</span>
                     </div>
-                    <div class="result-card-mini">
-                        <div class="result-teams">
-                            <span>M. City vs Coventry</span>
-                            <span class="result-score">1 - 0</span>
-                        </div>
-                        <div class="match-meta">No acertado ❌</div>
+                </div>
+                <!-- Contenido que se revela al pagar -->
+                <div class="unlocked-content" id="content-1">
+                    <div class="pick-result-text">
+                        <span>🎯 Pick: Wrexham o Empate + Menos de 3.5 Goles</span>
                     </div>
-                    <div class="result-card-mini">
-                        <div class="result-teams">
-                            <span>Sporting vs Nacional</span>
-                            <span class="result-score">2 - 0</span>
-                        </div>
-                        <div class="match-meta">Acertado ✅</div>
-                    </div>
-                    <div class="result-card-mini">
-                        <div class="result-teams">
-                            <span>Marítimo vs Benfica</span>
-                            <span class="result-score">0 - 3</span>
-                        </div>
-                        <div class="match-meta">Acertado ✅</div>
+                    <button class="stats-accordion-btn" onclick="toggleStats(1)">
+                        <span>📊 Ver respaldo estadístico</span> <span>▼</span>
+                    </button>
+                    <div class="stats-details" id="stats-1">
+                        Wrexham mantiene un invicto del 91% como local en los últimos 10 encuentros, combinándose con partidos de bajo promedio de anotación total.
                     </div>
                 </div>
             </div>
 
-            <!-- CAJA VIP EXCLUSIVA (ESTÉTICA NEÓN) -->
-            <div class="vip-neon-box">
-                <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
-                <h2>PICK VIP: <span>CUOTA DE ALTO VALOR</span></h2>
-                <p>Análisis estadístico avanzado con más del 85% de probabilidad estimada y cuotas superiores a 2.10.</p>
-                <div class="vip-locked-content">
-                    <span>🔒 Contenido protegido (Requiere créditos o acceso VIP)</span>
+            <!-- Tarjeta Pick 2 -->
+            <div class="pick-card" id="card-2">
+                <div class="pick-header">
+                    <div class="match-info">
+                        <span class="match-meta">📅 Hoy • Prob. 74%</span>
+                        <span class="match-teams">Real Madrid vs Inter</span>
+                    </div>
+                    <div class="unlock-action" onclick="unlockPick(2)">
+                        <span class="odd-hint">Cta: 1.85</span>
+                        <span class="credit-cost">💎 1 Cr.</span>
+                    </div>
+                </div>
+                <div class="unlocked-content" id="content-2">
+                    <div class="pick-result-text">
+                        <span>🎯 Pick: Ambos Equipos Anotan (BTTS)</span>
+                    </div>
+                    <button class="stats-accordion-btn" onclick="toggleStats(2)">
+                        <span>📊 Ver respaldo estadístico</span> <span>▼</span>
+                    </button>
+                    <div class="stats-details" id="stats-2">
+                        Ambos conjuntos superan el 80% de efectividad marcando gol en sus compromisos recientes de competición europea.
+                    </div>
                 </div>
             </div>
 
-            <!-- RECUADRO GANCHO TELEGRAM -->
-            <div class="hook-box">
-                <h2>🔥 CUOTA DEL DÍA: <span>2.03 RECOMENDADA</span></h2>
-                <p>No te pierdas el análisis detallado y nuestra combinada fuerte del fin de semana.</p>
-                <a href="https://t.me/PizarraBetOficial" target="_blank" class="telegram-btn">Unirme al Canal de Telegram</a>
+            <!-- Tarjeta Pick 3 -->
+            <div class="pick-card" id="card-3">
+                <div class="pick-header">
+                    <div class="match-info">
+                        <span class="match-meta">📅 Hoy • Prob. 90%</span>
+                        <span class="match-teams">Inter vs [Rival]</span>
+                    </div>
+                    <div class="unlock-action" onclick="unlockPick(3)">
+                        <span class="odd-hint">Cta: 1.50</span>
+                        <span class="credit-cost">💎 1 Cr.</span>
+                    </div>
+                </div>
+                <div class="unlocked-content" id="content-3">
+                    <div class="pick-result-text">
+                        <span>🎯 Pick: Multigol de 1 a 3 goles del Inter</span>
+                    </div>
+                    <button class="stats-accordion-btn" onclick="toggleStats(3)">
+                        <span>📊 Ver respaldo estadístico</span> <span>▼</span>
+                    </button>
+                    <div class="stats-details" id="stats-3">
+                        El Inter anota en promedio 2.1 goles por partido fuera de casa, cumpliendo esta franja de multigol en el 88% de los casos.
+                    </div>
+                </div>
             </div>
 
-            <!-- LAS 5 TARJETAS DE PICKS (Preparadas para ampliar a 10) -->
-            <div class="picks-grid">
-                
-                <!-- Tarjeta 1 -->
-                <div class="pick-card">
-                    <div>
-                        <div class="match-meta">📅 Hoy • Prob. Estimada: 72%</div>
-                        <div class="match-teams">Wrexham vs [Rival]</div>
+            <!-- Tarjeta Pick 4 -->
+            <div class="pick-card" id="card-4">
+                <div class="pick-header">
+                    <div class="match-info">
+                        <span class="match-meta">📅 Hoy • Prob. 73%</span>
+                        <span class="match-teams">Ind. Santa Fe vs [Rival]</span>
                     </div>
-                    <div class="pick-prediction">
-                        <span class="pick-label">Pick Sugerido</span>
-                        <span class="pick-value">Wrexham o Empate (Doble Oportunidad) + Menos de 3.5 Goles</span>
-                    </div>
-                    <div class="odd-container">
-                        <span class="odd-sublabel">Cta. Aprox</span>
-                        <div class="odd-badge">-</div>
+                    <div class="unlock-action" onclick="unlockPick(4)">
+                        <span class="odd-hint">Cta: 1.90</span>
+                        <span class="credit-cost">💎 2 Cr.</span>
                     </div>
                 </div>
-
-                <!-- Tarjeta 2 -->
-                <div class="pick-card">
-                    <div>
-                        <div class="match-meta">📅 Hoy • Prob. Estimada: 74%</div>
-                        <div class="match-teams">Real Madrid vs Inter</div>
+                <div class="unlocked-content" id="content-4">
+                    <div class="pick-result-text">
+                        <span>🎯 Pick: Santa Fe o Empate + Multigol 2-3</span>
                     </div>
-                    <div class="pick-prediction">
-                        <span class="pick-label">Pick Sugerido</span>
-                        <span class="pick-value">Ambos Equipos Anotan (BTTS)</span>
-                    </div>
-                    <div class="odd-container">
-                        <span class="odd-sublabel">Cta. Aprox</span>
-                        <div class="odd-badge">-</div>
+                    <button class="stats-accordion-btn" onclick="toggleStats(4)">
+                        <span>📊 Ver respaldo estadístico</span> <span>▼</span>
+                    </button>
+                    <div class="stats-details" id="stats-4">
+                        Solidez defensiva notable en condición de local, recibiendo menos de 0.6 goles por encuentro en el torneo actual.
                     </div>
                 </div>
-
-                <!-- Tarjeta 3 -->
-                <div class="pick-card">
-                    <div>
-                        <div class="match-meta">📅 Hoy • Prob. Estimada: 90%</div>
-                        <div class="match-teams">Inter (Visitante)</div>
-                    </div>
-                    <div class="pick-prediction">
-                        <span class="pick-label">Pick Sugerido</span>
-                        <span class="pick-value">Multigol de 1 a 3 goles del Inter</span>
-                    </div>
-                    <div class="odd-container">
-                        <span class="odd-sublabel">Cta. Aprox</span>
-                        <div class="odd-badge">-</div>
-                    </div>
-                </div>
-
-                <!-- Tarjeta 4 -->
-                <div class="pick-card">
-                    <div>
-                        <div class="match-meta">📅 Hoy • Prob. Estimada: 73%</div>
-                        <div class="match-teams">Ind. Santa Fe vs [Rival]</div>
-                    </div>
-                    <div class="pick-prediction">
-                        <span class="pick-label">Pick Sugerido</span>
-                        <span class="pick-value">Ind. Santa Fe o Empate + Multigol 2-3 goles</span>
-                    </div>
-                    <div class="odd-container">
-                        <span class="odd-sublabel">Cta. Aprox</span>
-                        <div class="odd-badge">-</div>
-                    </div>
-                </div>
-
-                <!-- Tarjeta 5 -->
-                <div class="pick-card">
-                    <div>
-                        <div class="match-meta">📅 Hoy • Prob. Estimada: 74%</div>
-                        <div class="match-teams">Fluminense vs [Rival]</div>
-                    </div>
-                    <div class="pick-prediction">
-                        <span class="pick-label">Pick Sugerido</span>
-                        <span class="pick-value">Fluminense o Empate + Menos de 3.5 Goles</span>
-                    </div>
-                    <div class="odd-container">
-                        <span class="odd-sublabel">Cta. Aprox</span>
-                        <div class="odd-badge">-</div>
-                    </div>
-                </div>
-
             </div>
 
-            <!-- TEXTO DE GESTIÓN Y RESPONSABILIDAD -->
-            <div class="disclaimer-box">
-                <strong>Aviso de Gestión y Responsabilidad:</strong> El contenido de esta plataforma está dirigido exclusivamente a mayores de edad. Recomendamos armar selecciones de máximo 2 a 3 líneas y destinar estrictamente entre el <strong>2% y 3% de tu capital por jugada</strong>. La estadística respalda, la pelota decide con responsabilidad.
+            <!-- Tarjeta Pick 5 -->
+            <div class="pick-card" id="card-5">
+                <div class="pick-header">
+                    <div class="match-info">
+                        <span class="match-meta">📅 Hoy • Prob. 74%</span>
+                        <span class="match-teams">Fluminense vs [Rival]</span>
+                    </div>
+                    <div class="unlock-action" onclick="unlockPick(5)">
+                        <span class="odd-hint">Cta: 1.80</span>
+                        <span class="credit-cost">💎 1 Cr.</span>
+                    </div>
+                </div>
+                <div class="unlocked-content" id="content-5">
+                    <div class="pick-result-text">
+                        <span>🎯 Pick: Fluminense o Empate + Menos de 3.5</span>
+                    </div>
+                    <button class="stats-accordion-btn" onclick="toggleStats(5)">
+                        <span>📊 Ver respaldo estadístico</span> <span>▼</span>
+                    </button>
+                    <div class="stats-details" id="stats-5">
+                        El control de posesión de Fluminense reduce drásticamente las opciones de ataque del rival, manteniendo marcadores controlados.
+                    </div>
+                </div>
             </div>
 
-        </main>
+        </div>
+
+        <!-- AVISO DE GESTIÓN -->
+        <div class="disclaimer-box">
+            <strong>Gestión:</strong> Destina 2%-3% de tu capital por jugada. La estadística respalda, la pelota decide.
+        </div>
+
     </div>
 
-    <!-- SCRIPT PARA EL ACORDEÓN MÓVIL -->
+    <!-- SCRIPT DE INTERACTIVIDAD (Desbloqueo y Estadísticas) -->
     <script>
-        const btn = document.getElementById('accordionBtn');
-        const content = document.getElementById('accordionContent');
-        
-        btn.addEventListener('click', function() {
-            content.classList.toggle('active');
-            if (content.classList.contains('active')) {
-                btn.querySelector('span:last-child').textContent = '▲';
-            } else {
-                btn.querySelector('span:last-child').textContent = '▼';
-            }
-        });
+        function unlockPick(id) {
+            const card = document.getElementById('card-' + id);
+            const actionBtn = card.querySelector('.unlock-action');
+            const content = document.getElementById('content-' + id);
+
+            // Simulamos el pago y desbloqueo visual al instante
+            actionBtn.style.display = 'none'; // Oculta el botón del diamante
+            content.classList.add('show');    // Muestra el pick revelado
+        }
+
+        function toggleStats(id) {
+            const stats = document.getElementById('stats-' + id);
+            stats.classList.toggle('show');
+        }
     </script>
 
 </body>
