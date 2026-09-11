@@ -478,9 +478,9 @@
     </div>
 
     <script>
-        // Inicialización de Supabase (Reemplaza con tus credenciales reales)
-        const SUPABASE_URL = 'TU_SUPABASE_URL';
-        const SUPABASE_ANON_KEY = 'TU_SUPABASE_ANON_KEY';
+        // Inicialización de Supabase con tus credenciales reales
+        const SUPABASE_URL = 'https://grqoeyhrejzdsbbonjqk.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_DMZGeboSDss26jQoSO3SiA_CVxP51Wy';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Inicialización y persistencia con localStorage
@@ -588,13 +588,7 @@
                 .eq('id', user.id)
                 .single();
 
-            // 3. Redirigir según el rol o mostrar herramientas de admin
-            if (profile && profile.role === 'admin') {
-                window.location.href = 'admin.html'; // Redirige directamente al panel admin si existe la página separada
-                return;
-            }
-
-            // Si se queda en la misma página, maneja la visibilidad del botón editor
+            // 3. Manejar la visibilidad del botón editor según el rol admin
             if (profile && profile.role === 'admin') {
                 document.getElementById('adminNavBtn').style.display = 'block';
             } else {
