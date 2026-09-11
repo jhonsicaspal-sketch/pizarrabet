@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Pizarra Bet | La estadística respalda, la pelota decide</title>
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-dark: #07090e;
@@ -357,11 +359,11 @@
             
             <div class="form-group" style="text-align: left; margin-top: 5px;">
                 <label>Correo Electrónico</label>
-                <input type="email" id="loginEmail" class="form-control" placeholder="tucorreo@email.com" value="admin@pizarramet.com">
+                <input type="email" id="loginEmail" class="form-control" placeholder="tucorreo@email.com">
             </div>
             <div class="form-group" style="text-align: left;">
                 <label>Contraseña</label>
-                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" value="123456">
+                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••">
             </div>
             
             <button class="btn-action" onclick="fucLoginSuccess()">🔑 Ingresar al Sistema</button>
@@ -476,6 +478,11 @@
     </div>
 
     <script>
+        // Inicialización de Supabase (Reemplaza con tus credenciales reales)
+        const SUPABASE_URL = 'TU_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'TU_SUPABASE_ANON_KEY';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         // Inicialización y persistencia con localStorage
         let userCredits = localStorage.getItem('pizarra_credits') !== null ? parseInt(localStorage.getItem('pizarra_credits')) : 20;
         
@@ -553,10 +560,42 @@
 
         let myPicks = JSON.parse(localStorage.getItem('pizarra_picks') || JSON.stringify(defaultPicks));
 
-        function fucLoginSuccess() {
+        async function fucLoginSuccess() {
             const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
             
-            if (email.includes('admin') || email === 'tucorreo@email.com' || email === '') {
+            if (!email || !password) {
+                alert('⚠️ Por favor ingresa correo y contraseña.');
+                return;
+            }
+
+            // 1. Autenticar con Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                alert("Error al entrar: " + error.message);
+                return;
+            }
+
+            // 2. Verificar el rol en la base de datos profiles
+            const user = data.user;
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+
+            // 3. Redirigir según el rol o mostrar herramientas de admin
+            if (profile && profile.role === 'admin') {
+                window.location.href = 'admin.html'; // Redirige directamente al panel admin si existe la página separada
+                return;
+            }
+
+            // Si se queda en la misma página, maneja la visibilidad del botón editor
+            if (profile && profile.role === 'admin') {
                 document.getElementById('adminNavBtn').style.display = 'block';
             } else {
                 document.getElementById('adminNavBtn').style.display = 'none';
@@ -569,6 +608,7 @@
         }
 
         function logout() {
+            supabase.auth.signOut();
             localStorage.removeItem('pizarra_session');
             location.reload();
         }
@@ -637,7 +677,7 @@
         }
 
         function unlockPick(id, cost) {
-            if (unlockedPicks.includes(id)) return; // Evita doble cobro si ya está desbloqueado
+            if (unlockedPicks.includes(id)) return;
 
             if (userCredits < cost) {
                 alert('⚠️ No tienes suficientes créditos para desbloquear este pronóstico.');
