@@ -1,80 +1,10 @@
-¡Excelente trabajo con el diseño de **La Pizarra Bet**! La interfaz con tema oscuro y acentos neón luce impecable y muy profesional.
-
-Para elevar la aplicación al siguiente nivel y solucionar **tres limitaciones clave** de la versión actual (persistencia real de datos, sincronización y seguridad), he identificado las áreas de mejora e implementado los cambios en el código mejorado.
-
----
-
-### 🔑 Puntos Clave de Mejora Aplicados
-
-1. **Persistencia Real en Supabase (Base de Datos Centralizada):**
-* **Antes:** Los pronósticos creados desde el editor se guardaban en el `localStorage` del navegador local. Si abrías la web en otro dispositivo o un usuario entraba, no veían las publicaciones del administrador.
-* **Ahora:** Los pronósticos se leen y guardan directamente en una tabla `picks` de Supabase en tiempo real.
-
-
-2. **Control de Créditos y Desbloqueos en Base de Datos (`profiles` y `unlocked_picks`):**
-* **Antes:** Si un usuario recargaba la página o abría en otro navegador, sus créditos se reiniciaban o podían editarse fácilmente desde la consola del navegador (`localStorage`).
-* **Ahora:** Los créditos del usuario se descuentan de forma segura y se persisten en la tabla `profiles` de Supabase. Además, la tabla `unlocked_picks` guarda exactamente qué pronósticos ya compró cada usuario.
-
-
-3. **Manejo Completo de Autenticación con Supabase Auth:**
-* La sesión permanece activa si el usuario recarga la página (`supabase.auth.getSession()`), evitando tener que iniciar sesión constantemente.
-
-
-
----
-
-### 🗄️ Estructura Recomendada de Tablas en Supabase
-
-Para que el código JS funcione a la perfección con tu proyecto de Supabase (`grqoeyhrejzdsbbonjqk`), asegúrate de crear estas tablas en el **SQL Editor** de tu panel de Supabase:
-
-```sql
--- 1. Tabla de Perfiles
-CREATE TABLE public.profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email TEXT,
-    role TEXT DEFAULT 'user', -- 'admin' o 'user'
-    credits INT DEFAULT 20
-);
-
--- 2. Tabla de Pronósticos / Picks
-CREATE TABLE public.picks (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    section TEXT NOT NULL, -- 'general' o 'vip'
-    teams TEXT NOT NULL,
-    prob TEXT NOT NULL,
-    odd TEXT NOT NULL,
-    cost INT NOT NULL,
-    meta TEXT NOT NULL,
-    result TEXT NOT NULL,
-    stats TEXT NOT NULL
-);
-
--- 3. Tabla de Desbloqueos (Historial de compras por usuario)
-CREATE TABLE public.unlocked_picks (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-    pick_id UUID REFERENCES public.picks(id) ON DELETE CASCADE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(user_id, pick_id)
-);
-
-```
-
----
-
-### 💻 Código HTML + JavaScript Completo y Optimizado
-
-Aquí tienes el código completo listo para usar:
-
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Pizarra Bet | La estadística respalda, la pelota decide</title>
-    <!-- Supabase CDN -->
+    <title>La Pizarra Bet | Pronósticos Deportivos</title>
+    <!-- SDK Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -88,562 +18,205 @@ Aquí tienes el código completo listo para usar:
             --text-muted: #8b9bb4;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* PANTALLA DE LOGIN INICIAL */
-        #loginScreen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 15px;
-        }
-
-        .login-card {
-            background-color: var(--card-bg);
-            border: 2px solid var(--neon-green);
-            padding: 25px;
-            border-radius: 16px;
-            width: 100%;
-            max-width: 380px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
-            text-align: center;
-        }
-
-        .login-logo {
-            width: 65px;
-            height: 65px;
-            border-radius: 50%;
-            border: 2px solid var(--neon-green);
-            margin: 0 auto;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
-            overflow: hidden;
-        }
-        .login-logo img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* APLICACIÓN PRINCIPAL */
-        #mainAppContent {
-            display: none;
-            flex-direction: column;
-            min-height: 100vh;
-            width: 100%;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 15px 10px; }
 
         header {
-            background-color: var(--card-bg);
-            border-bottom: 2px solid var(--card-border);
-            padding: 10px 15px;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            gap: 8px;
-        }
-
-        .logo-container {
-            display: flex;
             align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
-        .logo-circle {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: 2px solid var(--neon-green);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
-            background-color: #000;
-            flex-shrink: 0;
-        }
-
-        .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
-
-        .brand-text h1 {
-            font-size: 13px;
-            color: var(--neon-green);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            line-height: 1.1;
-        }
-
-        .brand-text p {
-            font-size: 8px;
-            color: var(--neon-blue);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .header-controls {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .user-credits {
-            background-color: #161f33;
-            border: 1px solid var(--neon-green);
-            padding: 5px 8px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: bold;
-            color: var(--neon-green);
-            white-space: nowrap;
-        }
-
-        .admin-toggle-btn, .auth-btn {
-            background-color: rgba(0, 217, 255, 0.1);
-            border: 1px solid var(--neon-blue);
-            color: var(--neon-blue);
-            padding: 5px 8px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            display: none;
-        }
-        .auth-btn {
-            background-color: rgba(255, 77, 77, 0.1);
-            border-color: #ff4d4d;
-            color: #ff4d4d;
-            display: flex;
-        }
-
-        .main-layout {
-            max-width: 700px;
-            margin: 15px auto;
-            padding: 0 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-        }
-
-        /* BANNER VIP */
-        .vip-banner-box {
-            background: linear-gradient(135deg, #1f1807 0%, #2b2005 100%);
-            border: 2px solid var(--neon-gold);
-            border-radius: 12px;
-            padding: 14px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(255, 183, 0, 0.25);
-            cursor: pointer;
-        }
-        .vip-badge-top {
-            display: inline-block;
-            background-color: rgba(255, 183, 0, 0.15);
-            color: var(--neon-gold);
-            font-size: 8px;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-            border: 1px solid var(--neon-gold);
-        }
-        .vip-banner-box h2 { font-size: 14px; margin-bottom: 3px; color: var(--text-main); }
-        .vip-banner-box h2 span { color: var(--neon-gold); }
-        .vip-banner-box p { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; }
-        .vip-action-hint {
-            background-color: rgba(255, 183, 0, 0.2);
-            border: 1px dashed var(--neon-gold);
-            padding: 6px;
-            border-radius: 8px;
-            font-size: 10px;
-            color: var(--neon-gold);
-            font-weight: bold;
-        }
-
-        /* VISTAS */
-        #vipView, #adminView {
-            display: none;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .vip-view-header {
-            background: linear-gradient(135deg, #2b2005 0%, #1f1807 100%);
-            border: 1px solid var(--neon-gold);
-            padding: 10px 12px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .vip-view-title { font-size: 14px; font-weight: bold; color: var(--neon-gold); text-transform: uppercase; }
-
-        .back-btn {
-            background-color: rgba(255, 183, 0, 0.15);
-            border: 1px solid var(--neon-gold);
-            color: var(--neon-gold);
-            font-size: 11px;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        /* EDITOR ADMIN */
-        .admin-card {
             background-color: var(--card-bg);
-            border: 1px solid var(--neon-blue);
-            border-radius: 10px;
-            padding: 15px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
         }
-        .admin-title { font-size: 14px; color: var(--neon-blue); font-weight: bold; margin-bottom: 12px; text-transform: uppercase; }
-        .form-group { margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
-        .form-group label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
-        .form-control {
+
+        .brand { font-size: 18px; font-weight: 800; color: var(--neon-green); text-transform: uppercase; letter-spacing: 1px; }
+        .user-status { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+        .credit-badge { background: rgba(0, 255, 136, 0.1); border: 1px solid var(--neon-green); color: var(--neon-green); padding: 4px 8px; border-radius: 20px; font-weight: bold; }
+        
+        .btn-action {
+            background-color: var(--neon-blue);
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
+
+        /* Login Card */
+        .auth-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .auth-card input {
             background-color: #07090e;
             border: 1px solid var(--card-border);
-            padding: 8px;
-            border-radius: 8px;
-            color: var(--text-main);
-            font-size: 12px;
-            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
         }
-        .form-row { display: flex; gap: 8px; flex-wrap: wrap; }
-        .form-row .form-group { flex: 1; min-width: 130px; }
-        .btn-action {
-            background: linear-gradient(135deg, #00ff88 0%, #00b359 100%);
+
+        /* Feed Picks */
+        .pick-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        .pick-header { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+        .pick-teams { font-size: 15px; font-weight: bold; color: var(--text-main); margin-bottom: 10px; }
+        .pick-info { display: flex; gap: 15px; font-size: 12px; margin-bottom: 12px; }
+        .pick-info span { color: var(--neon-gold); font-weight: bold; }
+
+        .locked-content {
+            filter: blur(4px);
+            user-select: none;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .unlocked-content {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px dashed var(--neon-green);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--neon-green);
+        }
+
+        .btn-unlock {
+            width: 100%;
+            background: linear-gradient(135deg, var(--neon-green) 0%, #00b359 100%);
             color: #000;
             border: none;
             padding: 10px;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: bold;
-            font-size: 12px;
             cursor: pointer;
-            width: 100%;
-            text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-        }
-
-        /* TARJETAS DE PRONÓSTICOS */
-        .picks-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-        .pick-card, .pick-card-vip {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-        }
-        .pick-card-vip { border-color: #3a2e0c; }
-        .pick-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .match-info { display: flex; flex-direction: column; }
-        .match-meta { font-size: 9px; color: var(--text-muted); }
-        .match-teams { font-size: 13px; font-weight: bold; color: var(--text-main); }
-
-        .unlock-action, .unlock-action-vip {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background-color: #161f33;
-            border: 1px solid var(--card-border);
-            padding: 6px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        .unlock-action-vip { background-color: #211904; border-color: #4a3a0e; }
-        .credit-cost { font-size: 11px; font-weight: bold; color: var(--neon-green); }
-        .credit-cost-vip { font-size: 11px; font-weight: bold; color: var(--neon-gold); }
-        .odd-hint { font-size: 9px; color: var(--text-muted); }
-
-        .unlocked-content, .unlocked-content-vip {
-            display: none;
-            background-color: rgba(0, 255, 136, 0.05);
-            border: 1px dashed var(--neon-green);
-            padding: 8px;
-            border-radius: 8px;
-            margin-top: 4px;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .unlocked-content-vip { background-color: rgba(255, 183, 0, 0.05); border-color: var(--neon-gold); }
-        .unlocked-content.show, .unlocked-content-vip.show { display: flex; }
-
-        .pick-result-text { font-size: 11px; font-weight: bold; color: var(--neon-green); }
-        .pick-result-text-vip { font-size: 11px; font-weight: bold; color: var(--neon-gold); }
-
-        .stats-accordion-btn, .stats-accordion-btn-vip {
-            background: none; border: none; color: var(--neon-blue); font-size: 10px; cursor: pointer; text-align: left; display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 4px 0;
-        }
-        .stats-accordion-btn-vip { color: #ffcc4d; }
-        .stats-details, .stats-details-vip {
-            display: none; font-size: 10px; color: var(--text-muted); background-color: rgba(0, 0, 0, 0.3); padding: 8px; border-radius: 6px; border-left: 2px solid var(--neon-blue); line-height: 1.4;
-        }
-        .stats-details-vip { border-left-color: var(--neon-gold); }
-        .stats-details.show, .stats-details-vip.show { display: block; }
-
-        .disclaimer-box {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-left: 3px solid var(--neon-blue);
-            border-radius: 8px;
-            padding: 10px;
-            font-size: 9px;
-            color: var(--text-muted);
-            line-height: 1.4;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN INICIAL -->
-    <div id="loginScreen">
-        <div class="login-card">
-            <div class="login-logo">
-                <img src="logopb.png" alt="Logo">
+    <header>
+        <div class="brand">⚽ La Pizarra Bet</div>
+        <div class="user-status" id="userStatus">
+            <!-- Carga dinámica del estado del usuario -->
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Formulario Autenticación -->
+        <div id="authSection" class="auth-card">
+            <h3 style="font-size: 14px; color: var(--neon-blue);">Ingresar / Registrarse</h3>
+            <input type="email" id="emailInput" placeholder="Tu correo electrónico">
+            <input type="password" id="passwordInput" placeholder="Tu contraseña">
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <button class="btn-action" style="flex:1;" onclick="handleAuth('login')">Iniciar Sesión</button>
+                <button class="btn-action" style="flex:1; background-color: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue);" onclick="handleAuth('signup')">Registrarse</button>
             </div>
-            <h2 style="color: var(--neon-green); font-size: 16px; text-transform: uppercase;">La Pizarra Bet</h2>
-            <p style="font-size: 10px; color: var(--text-muted);">La estadística respalda, la pelota decide</p>
-            
-            <div class="form-group" style="text-align: left; margin-top: 5px;">
-                <label>Correo Electrónico</label>
-                <input type="email" id="loginEmail" class="form-control" placeholder="tucorreo@email.com">
-            </div>
-            <div class="form-group" style="text-align: left;">
-                <label>Contraseña</label>
-                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••">
-            </div>
-            
-            <button class="btn-action" onclick="fucLoginSuccess()">🔑 Ingresar al Sistema</button>
+        </div>
+
+        <!-- Feed de Pronósticos -->
+        <div id="picksFeed">
+            <p style="text-align: center; font-size: 12px; color: var(--text-muted);">Cargando pronósticos...</p>
         </div>
     </div>
 
-    <!-- APLICACIÓN PRINCIPAL -->
-    <div id="mainAppContent">
-        <header>
-            <div class="logo-container" onclick="switchView('general')">
-                <div class="logo-circle">
-                    <img src="logopb.png" alt="Logo">
-                </div>
-                <div class="brand-text">
-                    <h1>PizarraBet</h1>
-                    <p>La estadística respalda</p>
-                </div>
-            </div>
-            <div class="header-controls">
-                <button class="admin-toggle-btn" id="adminNavBtn" onclick="switchView('admin')">⚙️ Editor</button>
-                <div class="user-credits" id="creditDisplay">💎 0 Cr.</div>
-                <button class="auth-btn" onclick="logout()">Salir</button>
-            </div>
-        </header>
-
-        <main class="main-layout">
-            
-            <!-- FEED GENERAL -->
-            <div id="generalView" class="picks-grid">
-                <div class="vip-banner-box" onclick="switchView('vip')">
-                    <div class="vip-badge-top">🌟 ZONA EXCLUSIVA VIP</div>
-                    <h2>PRONÓSTICOS VIP: <span>CUOTAS 1.85+</span></h2>
-                    <p>Entra aquí para ver selecciones protegidas de alto valor analítico.</p>
-                    <div class="vip-action-hint">✨ Acceder a la Zona VIP</div>
-                </div>
-
-                <div id="generalPicksContainer" class="picks-grid">
-                    <!-- Dinámico desde Supabase -->
-                </div>
-
-                <div class="disclaimer-box">
-                    <strong>Gestión:</strong> Destina 2%-3% de tu capital por jugada. La estadística respalda, la pelota decide.
-                </div>
-            </div>
-
-            <!-- VISTA VIP -->
-            <div id="vipView" class="picks-grid">
-                <div class="vip-view-header">
-                    <span class="vip-view-title">👑 Pronósticos VIP de Élite</span>
-                </div>
-
-                <div id="vipPicksContainer" class="picks-grid">
-                    <!-- Dinámico desde Supabase -->
-                </div>
-
-                <div class="back-btn" onclick="switchView('general')">← Volver al Feed General</div>
-            </div>
-
-            <!-- EDITOR ADMIN -->
-            <div id="adminView" class="picks-grid">
-                <div class="admin-card">
-                    <div class="admin-title">🛠️ Editor de Pronósticos</div>
-                    <form id="adminPickForm" onsubmit="handleCreatePick(event)">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Sección</label>
-                                <select id="pickSection" class="form-control">
-                                    <option value="general">Feed General</option>
-                                    <option value="vip">Zona VIP 🌟</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Costo (Créditos)</label>
-                                <input type="number" id="pickCost" class="form-control" min="1" value="2" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Equipos</label>
-                                <input type="text" id="pickTeams" class="form-control" placeholder="Ej: Real Madrid vs Barcelona" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Probabilidad</label>
-                                <input type="text" id="pickProb" class="form-control" value="85%" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Cuota</label>
-                                <input type="text" id="pickOdd" class="form-control" value="1.50" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Fecha / Meta</label>
-                                <input type="text" id="pickMeta" class="form-control" value="📅 Hoy • Análisis Táctico" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Pronóstico (Pick exacto)</label>
-                            <input type="text" id="pickResult" class="form-control" placeholder="Ej: Victoria local + Más de 1.5 goles" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Respaldo Estadístico</label>
-                            <textarea id="pickStats" class="form-control" rows="3" required>📈 Respaldo Táctico: Análisis detallado aquí...</textarea>
-                        </div>
-                        <button type="submit" class="btn-action">🚀 Publicar Pronóstico</button>
-                    </form>
-                </div>
-                <div class="back-btn" onclick="switchView('general')">← Volver al Feed</div>
-            </div>
-
-        </main>
-    </div>
-
     <script>
-        // Configuración de Supabase
+        // Configuración Supabase
         const SUPABASE_URL = 'https://grqoeyhrejzdsbbonjqk.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_DMZGeboSDss26jQoSO3SiA_CVxP51Wy';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Estado global del usuario actual
         let currentUser = null;
-        let userCredits = 0;
-        let unlockedPicks = [];
-        let myPicks = [];
+        let userProfile = null;
+        let unlockedPickIds = [];
 
-        // Comprobación de sesión al cargar la página
         window.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                await loadUserData(session.user);
-            }
+            await checkUserSession();
+            await loadPicks();
         });
 
-        async function fucLoginSuccess() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            
-            if (!email || !password) {
-                alert('⚠️ Por favor ingresa correo y contraseña.');
-                return;
-            }
+        async function checkUserSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            const statusDiv = document.getElementById('userStatus');
+            const authSection = document.getElementById('authSection');
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (session) {
+                currentUser = session.user;
+                authSection.style.display = 'none';
 
-            if (error) {
-                alert("Error al entrar: " + error.message);
-                return;
-            }
-
-            await loadUserData(data.user);
-        }
-
-        async function loadUserData(user) {
-            currentUser = user;
-
-            // 1. Obtener perfil de usuario (Rol y Créditos)
-            let { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', user.id)
-                .single();
-
-            // Si el usuario no tiene registro de perfil, se crea por defecto
-            if (!profile) {
-                const { data: newProfile } = await supabase
+                // Obtener perfil (créditos y rol)
+                const { data: profile } = await supabase
                     .from('profiles')
-                    .insert([{ id: user.id, email: user.email, credits: 20, role: 'user' }])
-                    .select()
+                    .select('*')
+                    .eq('id', currentUser.id)
                     .single();
-                profile = newProfile;
-            }
 
-            userCredits = profile ? profile.credits : 0;
-            updateCreditDisplay();
+                userProfile = profile;
 
-            // Manejar visibilidad del Editor Admin
-            if (profile && profile.role === 'admin') {
-                document.getElementById('adminNavBtn').style.display = 'block';
+                // Redireccionar si es Admin
+                if (userProfile && userProfile.role === 'admin') {
+                    window.location.href = 'admin.html';
+                    return;
+                }
+
+                // Cargar pronósticos desbloqueados por este usuario
+                const { data: unlocked } = await supabase
+                    .from('unlocked_picks')
+                    .select('pick_id')
+                    .eq('user_id', currentUser.id);
+
+                if (unlocked) {
+                    unlockedPickIds = unlocked.map(item => item.pick_id);
+                }
+
+                statusDiv.innerHTML = `
+                    <span class="credit-badge">⚡ ${userProfile ? userProfile.credits : 0} Créditos</span>
+                    <button class="btn-action" style="background-color: rgba(255,77,77,0.2); color: #ff4d4d;" onclick="logout()">Salir</button>
+                `;
             } else {
-                document.getElementById('adminNavBtn').style.display = 'none';
+                statusDiv.innerHTML = `<span style="color: var(--text-muted);">Invitado</span>`;
+                authSection.style.display = 'flex';
             }
-
-            // 2. Obtener historial de picks desbloqueados por este usuario
-            const { data: unlocks } = await supabase
-                .from('unlocked_picks')
-                .select('pick_id')
-                .eq('user_id', user.id);
-
-            unlockedPicks = unlocks ? unlocks.map(u => u.pick_id) : [];
-
-            // 3. Mostrar interfaz y cargar los picks desde la base de datos
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainAppContent').style.display = 'flex';
-
-            await fetchAndRenderPicks();
         }
 
-        async function fetchAndRenderPicks() {
-            const { data: picks, error } = await supabase
-                .from('picks')
-                .select('*')
-                .order('created_at', { ascending: false });
+        async function handleAuth(type) {
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
 
-            if (error) {
-                console.error("Error al cargar pronósticos:", error.message);
+            if (!email || !password) {
+                alert('Por favor ingresa correo y contraseña.');
                 return;
             }
 
-            myPicks = picks || [];
-            renderPicks();
+            if (type === 'login') {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) alert('Error: ' + error.message);
+                else location.reload();
+            } else {
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if (error) alert('Error: ' + error.message);
+                else alert('¡Cuenta creada! Revisa tu correo o inicia sesión.');
+            }
         }
 
         async function logout() {
@@ -651,157 +224,86 @@ Aquí tienes el código completo listo para usar:
             location.reload();
         }
 
-        function updateCreditDisplay() {
-            document.getElementById('creditDisplay').innerText = `💎 ${userCredits} Cr.`;
-        }
+        async function loadPicks() {
+            const feed = document.getElementById('picksFeed');
+            const { data: picks, error } = await supabase
+                .from('picks')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-        function renderPicks() {
-            const generalContainer = document.getElementById('generalPicksContainer');
-            const vipContainer = document.getElementById('vipPicksContainer');
-            
-            generalContainer.innerHTML = '';
-            vipContainer.innerHTML = '';
-
-            myPicks.forEach(pick => {
-                const isUnlocked = unlockedPicks.includes(pick.id);
-                
-                if (pick.section === 'general') {
-                    generalContainer.innerHTML += `
-                        <div class="pick-card" id="card-${pick.id}" style="${isUnlocked ? 'border-color: var(--neon-green);' : ''}">
-                            <div class="pick-header">
-                                <div class="match-info">
-                                    <span class="match-meta">${pick.meta} • Prob. ${pick.prob}</span>
-                                    <span class="match-teams">${pick.teams}</span>
-                                </div>
-                                <div class="unlock-action" onclick="unlockPick('${pick.id}', ${pick.cost})" style="${isUnlocked ? 'display: none;' : ''}">
-                                    <span class="odd-hint">Cta: ${pick.odd}</span>
-                                    <span class="credit-cost">💎 ${pick.cost} Cr.</span>
-                                </div>
-                            </div>
-                            <div class="unlocked-content ${isUnlocked ? 'show' : ''}" id="content-${pick.id}">
-                                <div class="pick-result-text">🎯 Pick: ${pick.result}</div>
-                                <button class="stats-accordion-btn" onclick="toggleStats('${pick.id}')">
-                                    <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                                </button>
-                                <div class="stats-details" id="stats-${pick.id}">${pick.stats}</div>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    vipContainer.innerHTML += `
-                        <div class="pick-card-vip" id="card-${pick.id}" style="${isUnlocked ? 'border-color: var(--neon-gold);' : ''}">
-                            <div class="pick-header">
-                                <div class="match-info">
-                                    <span class="match-meta" style="color: var(--neon-gold);">${pick.meta} • Prob. ${pick.prob}</span>
-                                    <span class="match-teams">${pick.teams}</span>
-                                </div>
-                                <div class="unlock-action-vip" onclick="unlockPick('${pick.id}', ${pick.cost})" style="${isUnlocked ? 'display: none;' : ''}">
-                                    <span class="odd-hint" style="color: #bfa143;">Cta: ${pick.odd}</span>
-                                    <span class="credit-cost-vip">💎 ${pick.cost} Cr.</span>
-                                </div>
-                            </div>
-                            <div class="unlocked-content-vip ${isUnlocked ? 'show' : ''}" id="content-${pick.id}">
-                                <div class="pick-result-text-vip">🎯 Pick VIP: ${pick.result}</div>
-                                <button class="stats-accordion-btn-vip" onclick="toggleStats('${pick.id}')">
-                                    <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
-                                </button>
-                                <div class="stats-details-vip" id="stats-${pick.id}">${pick.stats}</div>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-        }
-
-        async function unlockPick(id, cost) {
-            if (unlockedPicks.includes(id)) return;
-
-            if (userCredits < cost) {
-                alert('⚠️ No tienes suficientes créditos para desbloquear este pronóstico.');
+            if (error || !picks || picks.length === 0) {
+                feed.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 12px;">No hay pronósticos disponibles en este momento.</p>`;
                 return;
             }
 
-            const newCredits = userCredits - cost;
+            feed.innerHTML = '';
+            picks.forEach(pick => {
+                const isUnlocked = unlockedPickIds.includes(pick.id);
 
-            // 1. Descontar créditos en Supabase
-            const { error: profileErr } = await supabase
+                const card = document.createElement('div');
+                card.className = 'pick-card';
+                card.innerHTML = `
+                    <div class="pick-header">
+                        <span>${pick.meta}</span>
+                        <span>Prob: <strong>${pick.prob}</strong></span>
+                    </div>
+                    <div class="pick-teams">${pick.teams}</div>
+                    <div class="pick-info">
+                        <span>Cuota: ${pick.odd}</span>
+                        <span>Costo: ${pick.cost} crédito(s)</span>
+                    </div>
+                    ${isUnlocked ? `
+                        <div class="unlocked-content">
+                            <strong>🎯 Pronóstico:</strong> ${pick.result}<br><br>
+                            <small>${pick.stats}</small>
+                        </div>
+                    ` : `
+                        <div class="locked-content">
+                            🔒 Contenido bloqueado. Desbloquea para ver la selección y análisis.
+                        </div>
+                        <button class="btn-unlock" onclick="unlockPick('${pick.id}', ${pick.cost})">🔓 Desbloquear por ${pick.cost} crédito(s)</button>
+                    `}
+                `;
+                feed.appendChild(card);
+            });
+        }
+
+        async function unlockPick(pickId, cost) {
+            if (!currentUser) {
+                alert('Debes iniciar sesión para desbloquear pronósticos.');
+                return;
+            }
+
+            if (!userProfile || userProfile.credits < cost) {
+                alert('No tienes suficientes créditos.');
+                return;
+            }
+
+            // Descontar créditos y registrar desbloqueo
+            const newCredits = userProfile.credits - cost;
+
+            const { error: updateError } = await supabase
                 .from('profiles')
                 .update({ credits: newCredits })
                 .eq('id', currentUser.id);
 
-            if (profileErr) {
-                alert("Error al procesar los créditos: " + profileErr.message);
+            if (updateError) {
+                alert('Error al actualizar créditos.');
                 return;
             }
 
-            // 2. Registrar el desbloqueo en la BD
-            const { error: unlockErr } = await supabase
+            const { error: unlockError } = await supabase
                 .from('unlocked_picks')
-                .insert([{ user_id: currentUser.id, pick_id: id }]);
+                .insert([{ user_id: currentUser.id, pick_id: pickId }]);
 
-            if (unlockErr) {
-                alert("Error al desbloquear pronóstico: " + unlockErr.message);
+            if (unlockError) {
+                alert('Error al registrar desbloqueo.');
                 return;
             }
 
-            // 3. Actualizar estado local
-            userCredits = newCredits;
-            unlockedPicks.push(id);
-            updateCreditDisplay();
-            renderPicks();
-        }
-
-        function toggleStats(id) {
-            const stats = document.getElementById('stats-' + id);
-            if (stats) stats.classList.toggle('show');
-        }
-
-        async function handleCreatePick(e) {
-            e.preventDefault();
-            
-            const costVal = parseInt(document.getElementById('pickCost').value);
-            if (isNaN(costVal) || costVal <= 0) {
-                alert('⚠️ Por favor ingresa un costo de créditos válido.');
-                return;
-            }
-
-            const newPick = {
-                section: document.getElementById('pickSection').value,
-                teams: document.getElementById('pickTeams').value.trim(),
-                prob: document.getElementById('pickProb').value.trim(),
-                odd: document.getElementById('pickOdd').value.trim(),
-                cost: costVal,
-                meta: document.getElementById('pickMeta').value.trim(),
-                result: document.getElementById('pickResult').value.trim(),
-                stats: document.getElementById('pickStats').value.trim()
-            };
-
-            // Guardar directamente en Supabase
-            const { data, error } = await supabase
-                .from('picks')
-                .insert([newPick])
-                .select();
-
-            if (error) {
-                alert('Error al publicar el pronóstico: ' + error.message);
-                return;
-            }
-
-            alert('¡Pronóstico publicado con éxito!');
-            document.getElementById('adminPickForm').reset();
-            
-            await fetchAndRenderPicks();
-            switchView(newPick.section);
-        }
-
-        function switchView(viewName) {
-            document.getElementById('generalView').style.display = viewName === 'general' ? 'flex' : 'none';
-            document.getElementById('vipView').style.display = viewName === 'vip' ? 'flex' : 'none';
-            document.getElementById('adminView').style.display = viewName === 'admin' ? 'flex' : 'none';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            alert('🎉 ¡Pronóstico desbloqueado!');
+            location.reload();
         }
     </script>
 </body>
 </html>
-
-```
