@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Pizarra Bet | Pronósticos Deportivos</title>
-    <!-- SDK Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -33,7 +32,7 @@
             border: 1px solid var(--card-border);
         }
 
-        .brand { font-size: 18px; font-weight: 800; color: var(--neon-green); text-transform: uppercase; letter-spacing: 1px; }
+        .brand { font-size: 18px; font-weight: 800; color: var(--neon-green); text-transform: uppercase; }
         .user-status { display: flex; align-items: center; gap: 10px; font-size: 12px; }
         .credit-badge { background: rgba(0, 255, 136, 0.1); border: 1px solid var(--neon-green); color: var(--neon-green); padding: 4px 8px; border-radius: 20px; font-weight: bold; }
         
@@ -50,7 +49,6 @@
 
         .container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
 
-        /* Login Card */
         .auth-card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -69,14 +67,12 @@
             font-size: 13px;
         }
 
-        /* Feed Picks */
         .pick-card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 12px;
             padding: 15px;
             position: relative;
-            overflow: hidden;
         }
         .pick-header { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
         .pick-teams { font-size: 15px; font-weight: bold; color: var(--text-main); margin-bottom: 10px; }
@@ -118,37 +114,33 @@
     <header>
         <div class="brand">⚽ La Pizarra Bet</div>
         <div class="user-status" id="userStatus">
-            <!-- Carga dinámica del estado del usuario -->
+            <span style="color: var(--text-muted);">Verificando...</span>
         </div>
     </header>
 
     <div class="container">
-        <!-- Formulario Autenticación -->
         <div id="authSection" class="auth-card">
             <h3 style="font-size: 14px; color: var(--neon-blue);">Ingresar / Registrarse</h3>
             <input type="email" id="emailInput" placeholder="Tu correo electrónico">
             <input type="password" id="passwordInput" placeholder="Tu contraseña">
             <div style="display: flex; gap: 10px; margin-top: 5px;">
-                <button class="btn-action" style="flex:1;" onclick="handleAuth('login')">Iniciar Sesión</button>
-                <button class="btn-action" style="flex:1; background-color: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue);" onclick="handleAuth('signup')">Registrarse</button>
+                <button class="btn-action" style="flex:1;" onclick="handleLogin()">Iniciar Sesión</button>
+                <button class="btn-action" style="flex:1; background-color: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue);" onclick="handleSignUp()">Registrarse</button>
             </div>
         </div>
 
-        <!-- Feed de Pronósticos -->
         <div id="picksFeed">
             <p style="text-align: center; font-size: 12px; color: var(--text-muted);">Cargando pronósticos...</p>
         </div>
     </div>
 
     <script>
-        // Configuración Supabase
         const SUPABASE_URL = 'https://grqoeyhrejzdsbbonjqk.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_DMZGeboSDss26jQoSO3SiA_CVxP51Wy';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
         let userProfile = null;
-        let unlockedPickIds = [];
 
         window.addEventListener('DOMContentLoaded', async () => {
             await checkUserSession();
@@ -156,66 +148,96 @@
         });
 
         async function checkUserSession() {
-            const { data: { session } } = await supabase.auth.getSession();
-            const statusDiv = document.getElementById('userStatus');
-            const authSection = document.getElementById('authSection');
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const statusDiv = document.getElementById('userStatus');
+                const authSection = document.getElementById('authSection');
 
-            if (session) {
-                currentUser = session.user;
-                authSection.style.display = 'none';
+                if (session) {
+                    currentUser = session.user;
+                    authSection.style.display = 'none';
 
-                // Obtener perfil (créditos y rol)
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', currentUser.id)
-                    .single();
+                    const { data: profile, error } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', currentUser.id)
+                        .maybeSingle();
 
-                userProfile = profile;
+                    if (error) {
+                        console.error("Error cargando perfil:", error);
+                    }
 
-                // Redireccionar si es Admin
-                if (userProfile && userProfile.role === 'admin') {
-                    window.location.href = 'admin.html';
-                    return;
+                    userProfile = profile;
+
+                    if (userProfile && userProfile.role === 'admin') {
+                        window.location.href = 'admin.html';
+                        return;
+                    }
+
+                    statusDiv.innerHTML = `
+                        <span class="credit-badge">⚡ ${userProfile ? userProfile.credits : 0} Créditos</span>
+                        <button class="btn-action" style="background-color: rgba(255,77,77,0.2); color: #ff4d4d;" onclick="logout()">Salir</button>
+                    `;
+                } else {
+                    statusDiv.innerHTML = `<span style="color: var(--text-muted);">Invitado</span>`;
+                    authSection.style.display = 'flex';
                 }
-
-                // Cargar pronósticos desbloqueados por este usuario
-                const { data: unlocked } = await supabase
-                    .from('unlocked_picks')
-                    .select('pick_id')
-                    .eq('user_id', currentUser.id);
-
-                if (unlocked) {
-                    unlockedPickIds = unlocked.map(item => item.pick_id);
-                }
-
-                statusDiv.innerHTML = `
-                    <span class="credit-badge">⚡ ${userProfile ? userProfile.credits : 0} Créditos</span>
-                    <button class="btn-action" style="background-color: rgba(255,77,77,0.2); color: #ff4d4d;" onclick="logout()">Salir</button>
-                `;
-            } else {
-                statusDiv.innerHTML = `<span style="color: var(--text-muted);">Invitado</span>`;
-                authSection.style.display = 'flex';
+            } catch (err) {
+                alert("Error al verificar sesión: " + err.message);
             }
         }
 
-        async function handleAuth(type) {
+        async function handleLogin() {
             const email = document.getElementById('emailInput').value.trim();
             const password = document.getElementById('passwordInput').value.trim();
 
             if (!email || !password) {
-                alert('Por favor ingresa correo y contraseña.');
+                alert('Por favor completa correo y contraseña.');
                 return;
             }
 
-            if (type === 'login') {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) alert('Error: ' + error.message);
-                else location.reload();
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                alert('❌ Error al iniciar sesión: ' + error.message);
+                return;
+            }
+
+            // Consultar rol en la base de datos
+            const { data: profile, error: profError } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', data.user.id)
+                .maybeSingle();
+
+            if (profError) {
+                alert('Error al leer el rol: ' + profError.message);
+            }
+
+            if (profile && profile.role === 'admin') {
+                alert('🚀 Redirigiendo al Panel Admin...');
+                window.location.href = 'admin.html';
             } else {
-                const { data, error } = await supabase.auth.signUp({ email, password });
-                if (error) alert('Error: ' + error.message);
-                else alert('¡Cuenta creada! Revisa tu correo o inicia sesión.');
+                alert('✅ Inicio de sesión correcto. Redirigiendo...');
+                location.reload();
+            }
+        }
+
+        async function handleSignUp() {
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+
+            if (!email || !password) {
+                alert('Por favor completa correo y contraseña.');
+                return;
+            }
+
+            const { data, error } = await supabase.auth.signUp({ email, password });
+
+            if (error) {
+                alert('Error en registro: ' + error.message);
+            } else {
+                alert('¡Registro exitoso! Intenta iniciar sesión.');
             }
         }
 
@@ -232,14 +254,12 @@
                 .order('created_at', { ascending: false });
 
             if (error || !picks || picks.length === 0) {
-                feed.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 12px;">No hay pronósticos disponibles en este momento.</p>`;
+                feed.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 12px;">No hay pronósticos publicados aún.</p>`;
                 return;
             }
 
             feed.innerHTML = '';
             picks.forEach(pick => {
-                const isUnlocked = unlockedPickIds.includes(pick.id);
-
                 const card = document.createElement('div');
                 card.className = 'pick-card';
                 card.innerHTML = `
@@ -252,57 +272,10 @@
                         <span>Cuota: ${pick.odd}</span>
                         <span>Costo: ${pick.cost} crédito(s)</span>
                     </div>
-                    ${isUnlocked ? `
-                        <div class="unlocked-content">
-                            <strong>🎯 Pronóstico:</strong> ${pick.result}<br><br>
-                            <small>${pick.stats}</small>
-                        </div>
-                    ` : `
-                        <div class="locked-content">
-                            🔒 Contenido bloqueado. Desbloquea para ver la selección y análisis.
-                        </div>
-                        <button class="btn-unlock" onclick="unlockPick('${pick.id}', ${pick.cost})">🔓 Desbloquear por ${pick.cost} crédito(s)</button>
-                    `}
+                    <div class="locked-content">🔒 Contenido bloqueado</div>
                 `;
                 feed.appendChild(card);
             });
-        }
-
-        async function unlockPick(pickId, cost) {
-            if (!currentUser) {
-                alert('Debes iniciar sesión para desbloquear pronósticos.');
-                return;
-            }
-
-            if (!userProfile || userProfile.credits < cost) {
-                alert('No tienes suficientes créditos.');
-                return;
-            }
-
-            // Descontar créditos y registrar desbloqueo
-            const newCredits = userProfile.credits - cost;
-
-            const { error: updateError } = await supabase
-                .from('profiles')
-                .update({ credits: newCredits })
-                .eq('id', currentUser.id);
-
-            if (updateError) {
-                alert('Error al actualizar créditos.');
-                return;
-            }
-
-            const { error: unlockError } = await supabase
-                .from('unlocked_picks')
-                .insert([{ user_id: currentUser.id, pick_id: pickId }]);
-
-            if (unlockError) {
-                alert('Error al registrar desbloqueo.');
-                return;
-            }
-
-            alert('🎉 ¡Pronóstico desbloqueado!');
-            location.reload();
         }
     </script>
 </body>
