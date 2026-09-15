@@ -610,14 +610,26 @@
                 return;
             }
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+            loginBtn.innerText = '⏳ Conectando...';
 
-            if (error) {
-                showAuthError('No se pudo iniciar sesión: ' + error.message);
-                return;
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+                if (error) {
+                    showAuthError('No se pudo iniciar sesión: ' + error.message);
+                    return;
+                }
+
+                await loadSessionAndEnterApp(data.user);
+            } catch (networkError) {
+                console.error('Error de red en login:', networkError);
+                showAuthError('⚠️ Error de conexión con el servidor: ' + networkError.message);
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerText = '🔑 Ingresar';
             }
-
-            await loadSessionAndEnterApp(data.user);
         }
 
         async function handleRegister() {
@@ -635,21 +647,33 @@
                 return;
             }
 
-            const { data, error } = await supabase.auth.signUp({ email, password });
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.innerText = '⏳ Creando cuenta...';
 
-            if (error) {
-                showAuthError('No se pudo registrar: ' + error.message);
-                return;
+            try {
+                const { data, error } = await supabase.auth.signUp({ email, password });
+
+                if (error) {
+                    showAuthError('No se pudo registrar: ' + error.message);
+                    return;
+                }
+
+                // Si el proyecto tiene activada la confirmación por correo,
+                // Supabase no entrega sesión todavía: hay que avisarle al usuario.
+                if (!data.session) {
+                    showAuthError('Cuenta creada. Revisa tu correo para confirmar el registro antes de ingresar.');
+                    return;
+                }
+
+                await loadSessionAndEnterApp(data.user);
+            } catch (networkError) {
+                console.error('Error de red en registro:', networkError);
+                showAuthError('⚠️ Error de conexión con el servidor: ' + networkError.message);
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.innerText = '✍️ Crear cuenta';
             }
-
-            // Si el proyecto tiene activada la confirmación por correo,
-            // Supabase no entrega sesión todavía: hay que avisarle al usuario.
-            if (!data.session) {
-                showAuthError('Cuenta creada. Revisa tu correo para confirmar el registro antes de ingresar.');
-                return;
-            }
-
-            await loadSessionAndEnterApp(data.user);
         }
 
         // Trae el perfil (créditos, rol) desde la tabla "profiles" y entra a la app.
