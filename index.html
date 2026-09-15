@@ -346,7 +346,7 @@
 </head>
 <body>
 
-    <!-- LOGIN INICIAL -->
+    <!-- LOGIN / REGISTRO -->
     <div id="loginScreen">
         <div class="login-card">
             <div class="login-logo">
@@ -354,17 +354,22 @@
             </div>
             <h2 style="color: var(--neon-green); font-size: 16px; text-transform: uppercase;">La Pizarra Bet</h2>
             <p style="font-size: 10px; color: var(--text-muted);">La estadística respalda, la pelota decide</p>
-            
+
             <div class="form-group" style="text-align: left; margin-top: 5px;">
                 <label>Correo Electrónico</label>
-                <input type="email" id="loginEmail" class="form-control" placeholder="tucorreo@email.com" value="admin@pizarramet.com">
+                <input type="email" id="loginEmail" class="form-control" placeholder="tucorreo@email.com">
             </div>
             <div class="form-group" style="text-align: left;">
                 <label>Contraseña</label>
-                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" value="123456">
+                <input type="password" id="loginPassword" class="form-control" placeholder="••••••••">
             </div>
-            
-            <button class="btn-action" onclick="fucLoginSuccess()">🔑 Ingresar al Sistema</button>
+
+            <div id="authError" style="display:none; font-size: 10px; color: #ff4d4d; background: rgba(255,77,77,0.1); border: 1px solid #ff4d4d; border-radius: 8px; padding: 6px;"></div>
+
+            <button class="btn-action" id="loginBtn" onclick="handleLogin()">🔑 Ingresar</button>
+            <button class="btn-action" id="registerBtn" style="background: linear-gradient(135deg, #00d9ff 0%, #007a99 100%); display:none;" onclick="handleRegister()">✍️ Crear cuenta</button>
+
+            <p style="font-size: 10px; color: var(--text-muted); cursor: pointer; text-decoration: underline;" onclick="toggleAuthMode()" id="authModeToggle">¿No tienes cuenta? Regístrate</p>
         </div>
     </div>
 
@@ -383,7 +388,7 @@
             <div class="header-controls">
                 <button class="admin-toggle-btn" id="adminNavBtn" onclick="switchView('admin')">⚙️ Editor</button>
                 <div class="user-credits" id="creditDisplay">💎 20 Cr.</div>
-                <button class="auth-btn" onclick="location.reload()">Salir</button>
+                <button class="auth-btn" onclick="handleLogout()">Salir</button>
             </div>
         </header>
 
@@ -475,8 +480,20 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script>
-        let userCredits = 20;
+        // =====================================================
+        // CONEXIÓN A SUPABASE
+        // =====================================================
+        const SUPABASE_URL = 'https://grqoeyhrejzdsbbonjqk.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_DMZGeboSDss26jQoSO3SiA_CVxP51Wy';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;   // usuario autenticado de Supabase
+        let currentProfile = null; // fila de la tabla "profiles" de ese usuario
+        let authMode = 'login';   // 'login' o 'register'
+
+        let userCredits = 0;
 
         let myPicks = [
             // 4 Líneas Sugeridas en Feed General
@@ -550,21 +567,120 @@
             }
         ];
 
-        function fucLoginSuccess() {
+        function showAuthError(message) {
+            const box = document.getElementById('authError');
+            box.textContent = message;
+            box.style.display = 'block';
+        }
+        function clearAuthError() {
+            document.getElementById('authError').style.display = 'none';
+        }
+
+        function toggleAuthMode() {
+            clearAuthError();
+            authMode = authMode === 'login' ? 'register' : 'login';
+            const isRegister = authMode === 'register';
+            document.getElementById('loginBtn').style.display = isRegister ? 'none' : 'block';
+            document.getElementById('registerBtn').style.display = isRegister ? 'block' : 'none';
+            document.getElementById('authModeToggle').textContent = isRegister
+                ? '¿Ya tienes cuenta? Inicia sesión'
+                : '¿No tienes cuenta? Regístrate';
+        }
+
+        async function handleLogin() {
+            clearAuthError();
             const email = document.getElementById('loginEmail').value.trim();
-            
-            // EL BOTÓN DE EDITOR SOLO APARECE SI ENTRAS CON TU CORREO DE ADMIN O DEJAS ADMIN
-            if (email.includes('admin') || email === 'tucorreo@email.com' || email === '') {
-                document.getElementById('adminNavBtn').style.display = 'block';
-            } else {
-                document.getElementById('adminNavBtn').style.display = 'none';
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showAuthError('Ingresa tu correo y contraseña.');
+                return;
             }
+
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                showAuthError('No se pudo iniciar sesión: ' + error.message);
+                return;
+            }
+
+            await loadSessionAndEnterApp(data.user);
+        }
+
+        async function handleRegister() {
+            clearAuthError();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showAuthError('Ingresa un correo y una contraseña.');
+                return;
+            }
+            if (password.length < 6) {
+                showAuthError('La contraseña debe tener al menos 6 caracteres.');
+                return;
+            }
+
+            const { data, error } = await supabase.auth.signUp({ email, password });
+
+            if (error) {
+                showAuthError('No se pudo registrar: ' + error.message);
+                return;
+            }
+
+            // Si el proyecto tiene activada la confirmación por correo,
+            // Supabase no entrega sesión todavía: hay que avisarle al usuario.
+            if (!data.session) {
+                showAuthError('Cuenta creada. Revisa tu correo para confirmar el registro antes de ingresar.');
+                return;
+            }
+
+            await loadSessionAndEnterApp(data.user);
+        }
+
+        // Trae el perfil (créditos, rol) desde la tabla "profiles" y entra a la app.
+        async function loadSessionAndEnterApp(user) {
+            currentUser = user;
+
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (error || !profile) {
+                showAuthError('Tu cuenta se autenticó pero no se encontró tu perfil. Contacta soporte.');
+                return;
+            }
+
+            currentProfile = profile;
+            userCredits = profile.credits;
+
+            document.getElementById('adminNavBtn').style.display =
+                profile.role === 'admin' ? 'block' : 'none';
 
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainAppContent').style.display = 'flex';
             updateCreditDisplay();
             renderPicks();
         }
+
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            currentProfile = null;
+            location.reload();
+        }
+
+        // Al cargar la página, revisa si ya había una sesión abierta
+        // (Supabase la guarda en el navegador) para no pedir login de nuevo.
+        async function checkExistingSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session && session.user) {
+                await loadSessionAndEnterApp(session.user);
+            }
+        }
+        checkExistingSession();
 
         function updateCreditDisplay() {
             document.getElementById('creditDisplay').innerText = `💎 ${userCredits} Cr.`;
