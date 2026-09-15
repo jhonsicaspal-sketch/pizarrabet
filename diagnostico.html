@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico PizarraBet</title>
+<style>
+  body { font-family: monospace; background: #0a0a0a; color: #0f0; padding: 20px; max-width: 600px; margin: 0 auto; }
+  h2 { color: #fff; }
+  h3 { color: #0af; margin-top: 30px; }
+  .box { border: 1px solid #0f0; padding: 12px; margin: 10px 0; white-space: pre-wrap; word-break: break-word; border-radius: 6px; font-size: 13px; }
+  .err { color: #f55; border-color: #f55; }
+  input { width: 100%; padding: 8px; margin: 5px 0; box-sizing: border-box; background: #222; color: #fff; border: 1px solid #555; border-radius: 4px; }
+  button { padding: 12px; margin: 8px 0; width: 100%; background: #0a5; color: #000; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<h2>🔍 Diagnóstico de Conexión — PizarraBet</h2>
+<p style="color:#aaa; font-size:13px;">Esta página no depende del resto de la app. Solo prueba, paso a paso, si el navegador logra hablar con Supabase.</p>
+
+<div id="step1" class="box">1. Cargando SDK de Supabase...</div>
+<div id="step2" class="box">2. (esperando)</div>
+<div id="step3" class="box">3. (esperando)</div>
+
+<h3>Prueba de login real</h3>
+<input id="email" placeholder="correo del usuario admin">
+<input id="password" type="password" placeholder="contraseña">
+<button onclick="testLogin()">🔑 Probar login</button>
+<div id="loginResult" class="box">(sin probar todavía)</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const step3 = document.getElementById('step3');
+
+  // PASO 1: ¿cargó la librería desde el CDN?
+  if (window.supabase) {
+    step1.textContent = '1. ✅ El SDK de Supabase cargó correctamente.';
+  } else {
+    step1.textContent = '1. ❌ El SDK de Supabase NO cargó. Causas posibles: sin internet, un adblocker/firewall bloqueando cdn.jsdelivr.net, o el CDN caído.';
+    step1.className = 'box err';
+  }
+
+  const SUPABASE_URL = 'https://grqoeyhrejzdsbbonjqk.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_DMZGeboSDss26jQoSO3SiA_CVxP51Wy';
+
+  let supabase;
+  // PASO 2: ¿se pudo crear el cliente con esa URL y esa llave?
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    step2.textContent = '2. ✅ Cliente de Supabase creado sin errores.';
+  } catch (e) {
+    step2.textContent = '2. ❌ Error creando el cliente: ' + e.message;
+    step2.className = 'box err';
+  }
+
+  // PASO 3: ¿el navegador logra CONECTARSE de verdad al proyecto de Supabase?
+  // (esto no requiere login, solo pregunta "¿hay sesión activa?")
+  (async () => {
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        step3.textContent = '3. ❌ Supabase respondió pero con error: ' + JSON.stringify(error);
+        step3.className = 'box err';
+      } else {
+        step3.textContent = '3. ✅ El navegador SÍ logra conectarse a tu proyecto de Supabase.\nRespuesta: ' + JSON.stringify(data);
+      }
+    } catch (e) {
+      step3.textContent = '3. ❌ NO se pudo conectar con Supabase en absoluto.\nError: ' + e.message + '\n\nEsto suele significar: la URL del proyecto está mal, el proyecto está pausado, o algo (red corporativa, VPN, adblocker) está bloqueando la conexión a *.supabase.co.';
+      step3.className = 'box err';
+    }
+  })();
+
+  // PRUEBA DE LOGIN REAL, con resultado detallado en pantalla
+  async function testLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const box = document.getElementById('loginResult');
+    box.textContent = '⏳ Probando...';
+    box.className = 'box';
+
+    if (!supabase) {
+      box.textContent = '❌ No se puede probar: el cliente de Supabase nunca se creó (ver Paso 2 arriba).';
+      box.className = 'box err';
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        box.textContent = '❌ Supabase RECHAZÓ el login.\n\nMensaje: ' + error.message + '\n\nDetalle técnico completo:\n' + JSON.stringify(error, null, 2);
+        box.className = 'box err';
+      } else {
+        box.textContent = '✅ LOGIN EXITOSO.\n\nUsuario autenticado:\n' + JSON.stringify(data.user, null, 2);
+      }
+    } catch (e) {
+      box.textContent = '❌ EXCEPCIÓN DE RED al intentar el login (la petición nunca llegó o nunca volvió).\n\nError: ' + e.message;
+      box.className = 'box err';
+    }
+  }
+</script>
+</body>
+</html>
