@@ -480,20 +480,32 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // =====================================================
         // CONEXIÓN A SUPABASE
         // =====================================================
         const SUPABASE_URL = 'https://grqoeyhrejzdsbbonjqk.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_DMZGeboSDss26jQoSO3SiA_CVxP51Wy';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;   // usuario autenticado de Supabase
         let currentProfile = null; // fila de la tabla "profiles" de ese usuario
         let authMode = 'login';   // 'login' o 'register'
 
         let userCredits = 0;
+        let supabase;
+
+        try {
+            if (!window.supabase) {
+                throw new Error('El SDK de Supabase no cargó. Revisa tu conexión a internet o si algo está bloqueando cdn.jsdelivr.net (algunos adblockers o redes lo bloquean).');
+            }
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (initError) {
+            console.error('Error inicializando Supabase:', initError);
+            // showAuthError está definida más abajo en este mismo script, pero
+            // JavaScript "adelanta" las funciones (hoisting), así que ya existe aquí.
+            showAuthError('⚠️ Error crítico cargando el sistema: ' + initError.message);
+        }
 
         let myPicks = [
             // 4 Líneas Sugeridas en Feed General
@@ -589,6 +601,7 @@
 
         async function handleLogin() {
             clearAuthError();
+            if (!supabase) { showAuthError('El sistema no está listo (falló la conexión). Recarga la página.'); return; }
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
@@ -609,6 +622,7 @@
 
         async function handleRegister() {
             clearAuthError();
+            if (!supabase) { showAuthError('El sistema no está listo (falló la conexión). Recarga la página.'); return; }
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
@@ -675,6 +689,7 @@
         // Al cargar la página, revisa si ya había una sesión abierta
         // (Supabase la guarda en el navegador) para no pedir login de nuevo.
         async function checkExistingSession() {
+            if (!supabase) return;
             const { data: { session } } = await supabase.auth.getSession();
             if (session && session.user) {
                 await loadSessionAndEnterApp(session.user);
