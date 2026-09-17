@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Pizarra Bet | La estadística respalda, la pelota decide</title>
+    <title>Pizarra Bet | La estadística respalda, la pelota decide</title>
     <style>
         :root {
             --bg-dark: #07090e;
@@ -474,6 +474,10 @@
                         <button type="submit" class="btn-action">🚀 Publicar Pronóstico</button>
                     </form>
                 </div>
+                <div class="admin-card">
+                    <div class="admin-title">📋 Pronósticos publicados</div>
+                    <div id="adminPicksList" style="max-height: 300px; overflow-y: auto;"></div>
+                </div>
                 <div class="back-btn" onclick="switchView('general')">← Volver al Feed</div>
             </div>
 
@@ -507,77 +511,8 @@
             showAuthError('⚠️ Error crítico cargando el sistema: ' + initError.message);
         }
 
-        let myPicks = [
-            // 4 Líneas Sugeridas en Feed General
-            {
-                id: 'gen_1',
-                section: 'general',
-                teams: 'Real Madrid vs Valencia',
-                prob: '84%',
-                odd: '1.65',
-                cost: 2,
-                meta: '📅 Hoy • La Liga',
-                result: 'Victoria Real Madrid + Más de 1.5 goles',
-                stats: '📈 Respaldo: El Real Madrid ha ganado sus últimos 6 encuentros como local con un promedio de 2.8 goles a favor.'
-            },
-            {
-                id: 'gen_2',
-                section: 'general',
-                teams: 'Arsenal vs Chelsea',
-                prob: '78%',
-                odd: '1.75',
-                cost: 3,
-                meta: '📅 Mañana • Premier League',
-                result: 'Ambos Equipos Anotan (BTTS)',
-                stats: '📈 Respaldo: Los últimos 4 enfrentamientos directos entre ambos en este estadio registraron goles de ambos bandos.'
-            },
-            {
-                id: 'gen_3',
-                section: 'general',
-                teams: 'Inter de Milán vs Lazio',
-                prob: '82%',
-                odd: '1.55',
-                cost: 2,
-                meta: '📅 Hoy • Serie A',
-                result: 'Victoria Local (Inter)',
-                stats: '📈 Respaldo: La defensa del Inter en casa concede menos de 0.6 remates a puerta por partido en los últimos 90 minutos.'
-            },
-            {
-                id: 'gen_4',
-                section: 'general',
-                teams: 'Bayer Leverkusen vs Dortmund',
-                prob: '80%',
-                odd: '1.80',
-                cost: 3,
-                meta: '📅 Fin de Semana • Bundesliga',
-                result: 'Más de 2.5 Goles en el Partido',
-                stats: '📈 Respaldo: El promedio conjunto de xG de ambos equipos supera los 3.2 por encuentro.'
-            },
-
-            // 2 Picks VIP de Élite (Valores de 5 y 7 créditos)
-            {
-                id: 'vip_1',
-                section: 'vip',
-                teams: 'Manchester City vs Liverpool',
-                prob: '91%',
-                odd: '2.10',
-                cost: 5,
-                meta: '🌟 ÉLITE • Premier League VIP',
-                result: 'Victoria Manchester City + Más de 2.5 Goles',
-                stats: '👑 Respaldo VIP: Análisis táctico de posesión superior al 64% en transiciones rápidas y desgaste físico del rival.'
-            },
-            {
-                id: 'vip_2',
-                section: 'vip',
-                teams: 'Bayern Múnich vs RB Leipzig',
-                prob: '89%',
-                odd: '2.35',
-                cost: 7,
-                meta: '🌟 ÉLITE • Bundesliga VIP',
-                result: 'Handicap Asiático -1.5 Bayern Múnich',
-                stats: '👑 Respaldo VIP: Estudio de fatiga defensiva del visitante y efectividad del 92% en bloque alto.'
-            }
-        ];
+        let myPicks = [];          // se llena desde Supabase (loadPicksFromDB)
+        let unlockedContent = {};  // { pickId: { result, stats } } — solo lo ya pagado
 
         function showAuthError(message) {
             const box = document.getElementById('authError');
@@ -700,7 +635,45 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('mainAppContent').style.display = 'flex';
             updateCreditDisplay();
+
+            await loadPicksFromDB();
+            await loadMyUnlocks();
             renderPicks();
+        }
+
+        // Trae los picks visibles (sin result/stats — esos solo llegan al desbloquear).
+        async function loadPicksFromDB() {
+            const { data, error } = await sbClient
+                .from('picks_public')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error cargando picks:', error);
+                myPicks = [];
+                return;
+            }
+            myPicks = data || [];
+        }
+
+        // Trae los picks que este usuario ya pagó antes, para mostrárselos
+        // ya desbloqueados (sin cobrarle otra vez).
+        async function loadMyUnlocks() {
+            unlockedContent = {};
+            const { data: unlocks, error } = await sbClient
+                .from('user_unlocks')
+                .select('pick_id');
+
+            if (error || !unlocks || unlocks.length === 0) return;
+
+            // Pide el contenido de cada uno ya pagado (la función no cobra
+            // de nuevo si ya está en user_unlocks — ver Paso 6 del SQL).
+            for (const u of unlocks) {
+                const { data, error: rpcError } = await sbClient.rpc('unlock_pick', { p_pick_id: u.pick_id });
+                if (!rpcError && data && data[0]) {
+                    unlockedContent[u.pick_id] = data[0];
+                }
+            }
         }
 
         async function handleLogout() {
@@ -732,68 +705,78 @@
             generalContainer.innerHTML = '';
             vipContainer.innerHTML = '';
 
+            if (myPicks.length === 0) {
+                generalContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 12px;">Todavía no hay pronósticos publicados. Vuelve pronto.</p>';
+            }
+
             myPicks.forEach(pick => {
+                const unlocked = unlockedContent[pick.id];
+                const isVip = pick.section === 'vip';
+                const cardClass = isVip ? 'pick-card-vip' : 'pick-card';
+                const actionClass = isVip ? 'unlock-action-vip' : 'unlock-action';
+                const resultClass = isVip ? 'pick-result-text-vip' : 'pick-result-text';
+                const statsClass = isVip ? 'stats-details-vip' : 'stats-details';
+                const btnClass = isVip ? 'stats-accordion-btn-vip' : 'stats-accordion-btn';
+                const contentClass = isVip ? 'unlocked-content-vip' : 'unlocked-content';
+
+                const html = `
+                    <div class="${cardClass}" id="card-${pick.id}">
+                        <div class="pick-header">
+                            <div class="match-info">
+                                <span class="match-meta"${isVip ? ' style="color: var(--neon-gold);"' : ''}>${pick.meta} • Prob. ${pick.prob}</span>
+                                <span class="match-teams">${pick.teams}</span>
+                            </div>
+                            <div class="${actionClass}" onclick="unlockPick('${pick.id}', ${pick.cost})" style="${unlocked ? 'display:none;' : ''}">
+                                <span class="odd-hint"${isVip ? ' style="color: #bfa143;"' : ''}>Cta: ${pick.odd}</span>
+                                <span class="credit-cost${isVip ? '-vip' : ''}">💎 ${pick.cost} Cr.</span>
+                            </div>
+                        </div>
+                        <div class="${contentClass}${unlocked ? ' show' : ''}" id="content-${pick.id}">
+                            ${unlocked ? `
+                                <div class="${resultClass}">🎯 Pick${isVip ? ' VIP' : ''}: ${unlocked.result}</div>
+                                <button class="${btnClass}" onclick="toggleStats('${pick.id}')">
+                                    <span>📊 Ver respaldo estadístico${isVip ? ' VIP' : ''}</span> <span>▼</span>
+                                </button>
+                                <div class="${statsClass}" id="stats-${pick.id}">${unlocked.stats}</div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+
                 if (pick.section === 'general') {
-                    generalContainer.innerHTML += `
-                        <div class="pick-card" id="card-${pick.id}">
-                            <div class="pick-header">
-                                <div class="match-info">
-                                    <span class="match-meta">${pick.meta} • Prob. ${pick.prob}</span>
-                                    <span class="match-teams">${pick.teams}</span>
-                                </div>
-                                <div class="unlock-action" onclick="unlockPick('${pick.id}', ${pick.cost})">
-                                    <span class="odd-hint">Cta: ${pick.odd}</span>
-                                    <span class="credit-cost">💎 ${pick.cost} Cr.</span>
-                                </div>
-                            </div>
-                            <div class="unlocked-content" id="content-${pick.id}">
-                                <div class="pick-result-text">🎯 Pick: ${pick.result}</div>
-                                <button class="stats-accordion-btn" onclick="toggleStats('${pick.id}')">
-                                    <span>📊 Ver respaldo estadístico</span> <span>▼</span>
-                                </button>
-                                <div class="stats-details" id="stats-${pick.id}">${pick.stats}</div>
-                            </div>
-                        </div>
-                    `;
+                    generalContainer.innerHTML += html;
                 } else {
-                    vipContainer.innerHTML += `
-                        <div class="pick-card-vip" id="card-${pick.id}">
-                            <div class="pick-header">
-                                <div class="match-info">
-                                    <span class="match-meta" style="color: var(--neon-gold);">${pick.meta} • Prob. ${pick.prob}</span>
-                                    <span class="match-teams">${pick.teams}</span>
-                                </div>
-                                <div class="unlock-action-vip" onclick="unlockPick('${pick.id}', ${pick.cost})">
-                                    <span class="odd-hint" style="color: #bfa143;">Cta: ${pick.odd}</span>
-                                    <span class="credit-cost-vip">💎 ${pick.cost} Cr.</span>
-                                </div>
-                            </div>
-                            <div class="unlocked-content-vip" id="content-${pick.id}">
-                                <div class="pick-result-text-vip">🎯 Pick VIP: ${pick.result}</div>
-                                <button class="stats-accordion-btn-vip" onclick="toggleStats('${pick.id}')">
-                                    <span>📊 Ver respaldo estadístico VIP</span> <span>▼</span>
-                                </button>
-                                <div class="stats-details-vip" id="stats-${pick.id}">${pick.stats}</div>
-                            </div>
-                        </div>
-                    `;
+                    vipContainer.innerHTML += html;
                 }
             });
         }
 
-        function unlockPick(id, cost) {
+        async function unlockPick(id, cost) {
             if (userCredits < cost) {
                 alert('⚠️ No tienes suficientes créditos para desbloquear este pronóstico.');
                 return;
             }
 
-            userCredits -= cost;
+            const actionEl = document.querySelector('#card-' + id + ' .unlock-action, #card-' + id + ' .unlock-action-vip');
+            if (actionEl) actionEl.style.pointerEvents = 'none';
+
+            const { data, error } = await sbClient.rpc('unlock_pick', { p_pick_id: id });
+
+            if (error) {
+                alert('⚠️ No se pudo desbloquear: ' + error.message);
+                if (actionEl) actionEl.style.pointerEvents = 'auto';
+                return;
+            }
+
+            unlockedContent[id] = data[0];
+
+            // Trae el saldo real actualizado desde el servidor (no lo calculamos
+            // localmente, así siempre coincide con lo que de verdad se cobró).
+            const { data: profile } = await sbClient.from('profiles').select('credits').eq('id', currentUser.id).single();
+            if (profile) userCredits = profile.credits;
             updateCreditDisplay();
 
-            document.getElementById('card-' + id).style.borderColor = 'var(--neon-green)';
-            const actionBtn = document.querySelector('#card-' + id + ' .unlock-action, #card-' + id + ' .unlock-action-vip');
-            if(actionBtn) actionBtn.style.display = 'none';
-            document.getElementById('content-' + id).classList.add('show');
+            renderPicks();
         }
 
         function toggleStats(id) {
@@ -801,10 +784,13 @@
             if (stats) stats.classList.toggle('show');
         }
 
-        function handleCreatePick(e) {
+        async function handleCreatePick(e) {
             e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerText = '⏳ Publicando...';
+
             const newPick = {
-                id: 'custom_' + Date.now(),
                 section: document.getElementById('pickSection').value,
                 teams: document.getElementById('pickTeams').value,
                 prob: document.getElementById('pickProb').value,
@@ -815,16 +801,66 @@
                 stats: document.getElementById('pickStats').value
             };
 
-            myPicks.unshift(newPick);
+            const { error } = await sbClient.from('picks').insert([newPick]);
+
+            submitBtn.disabled = false;
+            submitBtn.innerText = '🚀 Publicar Pronóstico';
+
+            if (error) {
+                alert('⚠️ No se pudo publicar: ' + error.message);
+                return;
+            }
+
+            document.getElementById('adminPickForm').reset();
+            await loadPicksFromDB();
             renderPicks();
+            renderAdminPicksList();
             alert('¡Pronóstico publicado con éxito!');
             switchView(newPick.section);
+        }
+
+        // Lista de picks existentes en el panel admin, con botón para
+        // activar/desactivar (ocultar del feed sin borrar el historial).
+        async function renderAdminPicksList() {
+            const listEl = document.getElementById('adminPicksList');
+            if (!listEl) return;
+
+            const { data, error } = await sbClient
+                .from('picks')
+                .select('id, section, teams, cost, is_active, created_at')
+                .order('created_at', { ascending: false });
+
+            if (error || !data) {
+                listEl.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">No se pudo cargar la lista.</p>';
+                return;
+            }
+
+            listEl.innerHTML = data.map(p => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:12px;">
+                    <span>${p.is_active ? '🟢' : '⚪'} ${p.teams} <span style="color:var(--text-muted);">(${p.section}, ${p.cost} Cr.)</span></span>
+                    <button class="stats-accordion-btn" style="padding:4px 8px; font-size:11px;" onclick="togglePickActive('${p.id}', ${!p.is_active})">
+                        ${p.is_active ? 'Desactivar' : 'Activar'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function togglePickActive(id, newState) {
+            const { error } = await sbClient.from('picks').update({ is_active: newState }).eq('id', id);
+            if (error) {
+                alert('⚠️ No se pudo actualizar: ' + error.message);
+                return;
+            }
+            await loadPicksFromDB();
+            renderPicks();
+            renderAdminPicksList();
         }
 
         function switchView(viewName) {
             document.getElementById('generalView').style.display = viewName === 'general' ? 'flex' : 'none';
             document.getElementById('vipView').style.display = viewName === 'vip' ? 'flex' : 'none';
             document.getElementById('adminView').style.display = viewName === 'admin' ? 'flex' : 'none';
+            if (viewName === 'admin') renderAdminPicksList();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
