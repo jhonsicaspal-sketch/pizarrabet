@@ -46,10 +46,10 @@
   const SUPABASE_URL = 'https://grqoeyhrejzdsbbonjqk.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_DMZGeboSDss26jQoSO3SiA_CVxP51Wy';
 
-  let supabase;
+  let sbClient;
   // PASO 2: ¿se pudo crear el cliente con esa URL y esa llave?
   try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     step2.textContent = '2. ✅ Cliente de Supabase creado sin errores.';
   } catch (e) {
     step2.textContent = '2. ❌ Error creando el cliente: ' + e.message;
@@ -60,7 +60,7 @@
   // (esto no requiere login, solo pregunta "¿hay sesión activa?")
   (async () => {
     try {
-      const { data, error } = await supabase.auth.getSession();
+      const { data, error } = await sbClient.auth.getSession();
       if (error) {
         step3.textContent = '3. ❌ Supabase respondió pero con error: ' + JSON.stringify(error);
         step3.className = 'box err';
@@ -81,14 +81,14 @@
     box.textContent = '⏳ Probando...';
     box.className = 'box';
 
-    if (!supabase) {
+    if (!sbClient) {
       box.textContent = '❌ No se puede probar: el cliente de Supabase nunca se creó (ver Paso 2 arriba).';
       box.className = 'box err';
       return;
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
       if (error) {
         box.textContent = '❌ Supabase RECHAZÓ el login.\n\nMensaje: ' + error.message + '\n\nDetalle técnico completo:\n' + JSON.stringify(error, null, 2);
         box.className = 'box err';
