@@ -493,13 +493,13 @@
         let authMode = 'login';   // 'login' o 'register'
 
         let userCredits = 0;
-        let supabase;
+        let sbClient;
 
         try {
             if (!window.supabase) {
                 throw new Error('El SDK de Supabase no cargó. Revisa tu conexión a internet o si algo está bloqueando cdn.jsdelivr.net (algunos adblockers o redes lo bloquean).');
             }
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         } catch (initError) {
             console.error('Error inicializando Supabase:', initError);
             // showAuthError está definida más abajo en este mismo script, pero
@@ -601,7 +601,7 @@
 
         async function handleLogin() {
             clearAuthError();
-            if (!supabase) { showAuthError('El sistema no está listo (falló la conexión). Recarga la página.'); return; }
+            if (!sbClient) { showAuthError('El sistema no está listo (falló la conexión). Recarga la página.'); return; }
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
@@ -615,7 +615,7 @@
             loginBtn.innerText = '⏳ Conectando...';
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
 
                 if (error) {
                     showAuthError('No se pudo iniciar sesión: ' + error.message);
@@ -634,7 +634,7 @@
 
         async function handleRegister() {
             clearAuthError();
-            if (!supabase) { showAuthError('El sistema no está listo (falló la conexión). Recarga la página.'); return; }
+            if (!sbClient) { showAuthError('El sistema no está listo (falló la conexión). Recarga la página.'); return; }
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
 
@@ -652,7 +652,7 @@
             registerBtn.innerText = '⏳ Creando cuenta...';
 
             try {
-                const { data, error } = await supabase.auth.signUp({ email, password });
+                const { data, error } = await sbClient.auth.signUp({ email, password });
 
                 if (error) {
                     showAuthError('No se pudo registrar: ' + error.message);
@@ -680,7 +680,7 @@
         async function loadSessionAndEnterApp(user) {
             currentUser = user;
 
-            const { data: profile, error } = await supabase
+            const { data: profile, error } = await sbClient
                 .from('profiles')
                 .select('*')
                 .eq('id', user.id)
@@ -704,7 +704,7 @@
         }
 
         async function handleLogout() {
-            await supabase.auth.signOut();
+            await sbClient.auth.signOut();
             currentUser = null;
             currentProfile = null;
             location.reload();
@@ -713,8 +713,8 @@
         // Al cargar la página, revisa si ya había una sesión abierta
         // (Supabase la guarda en el navegador) para no pedir login de nuevo.
         async function checkExistingSession() {
-            if (!supabase) return;
-            const { data: { session } } = await supabase.auth.getSession();
+            if (!sbClient) return;
+            const { data: { session } } = await sbClient.auth.getSession();
             if (session && session.user) {
                 await loadSessionAndEnterApp(session.user);
             }
