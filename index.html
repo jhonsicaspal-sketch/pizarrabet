@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pizarra Bet | La estadística respalda, la pelota decide</title>
+    <title>La Pizarra Bet | La estadística respalda, la pelota decide</title>
     <style>
         :root {
             --bg-dark: #07090e;
@@ -472,6 +472,7 @@
                             <textarea id="pickStats" class="form-control" rows="3" required>📈 Respaldo Táctico: Análisis detallado aquí...</textarea>
                         </div>
                         <button type="submit" class="btn-action">🚀 Publicar Pronóstico</button>
+                        <button type="button" id="cancelEditBtn" class="stats-accordion-btn" style="display:none; width:100%; margin-top:6px; padding:8px;" onclick="cancelEditPick()">✖️ Cancelar edición</button>
                     </form>
                 </div>
                 <div class="admin-card">
@@ -784,13 +785,15 @@
             if (stats) stats.classList.toggle('show');
         }
 
+        let editingPickId = null; // null = creando uno nuevo; con valor = editando ese pick
+
         async function handleCreatePick(e) {
             e.preventDefault();
             const submitBtn = e.target.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
-            submitBtn.innerText = '⏳ Publicando...';
+            submitBtn.innerText = editingPickId ? '⏳ Guardando...' : '⏳ Publicando...';
 
-            const newPick = {
+            const pickData = {
                 section: document.getElementById('pickSection').value,
                 teams: document.getElementById('pickTeams').value,
                 prob: document.getElementById('pickProb').value,
@@ -801,26 +804,60 @@
                 stats: document.getElementById('pickStats').value
             };
 
-            const { error } = await sbClient.from('picks').insert([newPick]);
+            const { error } = editingPickId
+                ? await sbClient.from('picks').update(pickData).eq('id', editingPickId)
+                : await sbClient.from('picks').insert([pickData]);
 
             submitBtn.disabled = false;
             submitBtn.innerText = '🚀 Publicar Pronóstico';
 
             if (error) {
-                alert('⚠️ No se pudo publicar: ' + error.message);
+                alert('⚠️ No se pudo guardar: ' + error.message);
                 return;
             }
 
-            document.getElementById('adminPickForm').reset();
+            const wasEditing = !!editingPickId;
+            cancelEditPick();
             await loadPicksFromDB();
             renderPicks();
             renderAdminPicksList();
-            alert('¡Pronóstico publicado con éxito!');
-            switchView(newPick.section);
+            alert(wasEditing ? '¡Cambios guardados!' : '¡Pronóstico publicado con éxito!');
+            switchView(pickData.section);
         }
 
-        // Lista de picks existentes en el panel admin, con botón para
-        // activar/desactivar (ocultar del feed sin borrar el historial).
+        // Trae el pick completo (incluye result/stats) y lo carga en el
+        // formulario para editarlo, en vez de crear uno nuevo.
+        async function editPick(id) {
+            const { data: pick, error } = await sbClient.from('picks').select('*').eq('id', id).single();
+            if (error || !pick) {
+                alert('⚠️ No se pudo cargar el pick: ' + (error ? error.message : ''));
+                return;
+            }
+
+            editingPickId = id;
+            document.getElementById('pickSection').value = pick.section;
+            document.getElementById('pickCost').value = pick.cost;
+            document.getElementById('pickTeams').value = pick.teams;
+            document.getElementById('pickProb').value = pick.prob;
+            document.getElementById('pickOdd').value = pick.odd;
+            document.getElementById('pickMeta').value = pick.meta;
+            document.getElementById('pickResult').value = pick.result;
+            document.getElementById('pickStats').value = pick.stats;
+
+            document.querySelector('#adminPickForm button[type="submit"]').innerText = '💾 Guardar cambios';
+            document.getElementById('cancelEditBtn').style.display = 'inline-block';
+            document.getElementById('adminPickForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEditPick() {
+            editingPickId = null;
+            document.getElementById('adminPickForm').reset();
+            document.querySelector('#adminPickForm button[type="submit"]').innerText = '🚀 Publicar Pronóstico';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+
+        // Lista de picks existentes en el panel admin, con botones para
+        // editar y activar/desactivar (ocultar del feed sin borrar el historial).
         async function renderAdminPicksList() {
             const listEl = document.getElementById('adminPicksList');
             if (!listEl) return;
@@ -836,11 +873,16 @@
             }
 
             listEl.innerHTML = data.map(p => `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:12px; gap:6px;">
                     <span>${p.is_active ? '🟢' : '⚪'} ${p.teams} <span style="color:var(--text-muted);">(${p.section}, ${p.cost} Cr.)</span></span>
-                    <button class="stats-accordion-btn" style="padding:4px 8px; font-size:11px;" onclick="togglePickActive('${p.id}', ${!p.is_active})">
-                        ${p.is_active ? 'Desactivar' : 'Activar'}
-                    </button>
+                    <span style="display:flex; gap:4px; flex-shrink:0;">
+                        <button class="stats-accordion-btn" style="padding:4px 8px; font-size:11px;" onclick="editPick('${p.id}')">
+                            ✏️ Editar
+                        </button>
+                        <button class="stats-accordion-btn" style="padding:4px 8px; font-size:11px;" onclick="togglePickActive('${p.id}', ${!p.is_active})">
+                            ${p.is_active ? 'Desactivar' : 'Activar'}
+                        </button>
+                    </span>
                 </div>
             `).join('');
         }
@@ -855,6 +897,7 @@
             renderPicks();
             renderAdminPicksList();
         }
+
 
         function switchView(viewName) {
             document.getElementById('generalView').style.display = viewName === 'general' ? 'flex' : 'none';
