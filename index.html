@@ -741,12 +741,17 @@
                 const btnClass = isVip ? 'stats-accordion-btn-vip' : 'stats-accordion-btn';
                 const contentClass = isVip ? 'unlocked-content-vip' : 'unlocked-content';
 
+                const expiryLabel = pick.expires_at
+                    ? '⏳ Disponible hasta ' + new Date(pick.expires_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+                    : '';
+
                 const html = `
                     <div class="${cardClass}" id="card-${pick.id}">
                         <div class="pick-header">
                             <div class="match-info">
                                 <span class="match-meta"${isVip ? ' style="color: var(--neon-gold);"' : ''}>${pick.meta} • Prob. ${pick.prob}</span>
                                 <span class="match-teams">${pick.teams}</span>
+                                ${expiryLabel ? `<span style="font-size:9px; color: var(--text-muted);">${expiryLabel}</span>` : ''}
                             </div>
                             <div class="${actionClass}" onclick="unlockPick('${pick.id}', ${pick.cost})" style="${unlocked ? 'display:none;' : ''}">
                                 <span class="odd-hint"${isVip ? ' style="color: #bfa143;"' : ''}>Cta: ${pick.odd}</span>
@@ -1009,15 +1014,13 @@
             }
 
             listEl.innerHTML = results.map(r => `
-                <div class="pick-card" style="margin-bottom:8px; border-color: ${r.outcome === 'green' ? 'var(--neon-green)' : '#ff4d4d'};">
-                    <div class="pick-header">
-                        <div class="match-info">
-                            <span class="match-meta">${r.meta} • ${new Date(r.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}</span>
-                            <span class="match-teams">${r.teams}</span>
-                        </div>
-                        <span style="font-size:18px;">${r.outcome === 'green' ? '✅' : '❌'}</span>
+                <div style="background-color: var(--card-bg); border: 1px solid ${r.outcome === 'green' ? 'var(--neon-green)' : '#ff4d4d'}; border-radius: 8px; padding: 6px 10px; margin-bottom: 5px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <div style="min-width:0;">
+                        <div style="font-size:8px; color: var(--text-muted); white-space:nowrap;">${r.meta} • ${new Date(r.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}</div>
+                        <div style="font-size:11px; font-weight:bold; color: var(--text-main);">${r.teams}</div>
+                        <div style="font-size:10px; color: ${r.outcome === 'green' ? 'var(--neon-green)' : '#ff4d4d'};">🎯 ${r.result}</div>
                     </div>
-                    <div class="pick-result-text" style="margin-top:6px;">🎯 ${r.result}</div>
+                    <span style="font-size:14px; flex-shrink:0;">${r.outcome === 'green' ? '✅' : '❌'}</span>
                 </div>
             `).join('');
         }
