@@ -410,6 +410,23 @@
                 <div class="disclaimer-box">
                     <strong>Gestión:</strong> Destina 2%-3% de tu capital por jugada. La estadística respalda, la pelota decide.
                 </div>
+
+                <div class="back-btn" onclick="switchView('results')" style="cursor:pointer;">📊 Ver historial de resultados</div>
+            </div>
+
+            <!-- HISTORIAL DE RESULTADOS -->
+            <div id="resultsView" class="picks-grid" style="display: none;">
+                <div class="vip-view-header">
+                    <span class="vip-view-title">📊 Historial de Resultados</span>
+                </div>
+
+                <div id="resultsSummary" style="display:flex; gap:10px; margin-bottom:14px;"></div>
+
+                <div id="resultsContainer">
+                    <!-- Se inyecta por JS -->
+                </div>
+
+                <div class="back-btn" onclick="switchView('general')">← Volver al Feed General</div>
             </div>
 
             <!-- VISTA VIP -->
@@ -462,6 +479,10 @@
                                 <label>Fecha / Meta</label>
                                 <input type="text" id="pickMeta" class="form-control" value="📅 Hoy • Análisis Táctico" required>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Vence el (opcional — se oculta solo al pasar esta hora)</label>
+                            <input type="datetime-local" id="pickExpiresAt" class="form-control">
                         </div>
                         <div class="form-group">
                             <label>Pronóstico (Pick exacto)</label>
@@ -793,6 +814,8 @@
             submitBtn.disabled = true;
             submitBtn.innerText = editingPickId ? '⏳ Guardando...' : '⏳ Publicando...';
 
+            const expiresValue = document.getElementById('pickExpiresAt').value;
+
             const pickData = {
                 section: document.getElementById('pickSection').value,
                 teams: document.getElementById('pickTeams').value,
@@ -800,6 +823,7 @@
                 odd: document.getElementById('pickOdd').value,
                 cost: parseInt(document.getElementById('pickCost').value),
                 meta: document.getElementById('pickMeta').value,
+                expires_at: expiresValue ? new Date(expiresValue).toISOString() : null,
                 result: document.getElementById('pickResult').value,
                 stats: document.getElementById('pickStats').value
             };
@@ -841,6 +865,15 @@
             document.getElementById('pickProb').value = pick.prob;
             document.getElementById('pickOdd').value = pick.odd;
             document.getElementById('pickMeta').value = pick.meta;
+            // datetime-local necesita "YYYY-MM-DDTHH:MM" en hora LOCAL del admin
+            // (toISOString() da UTC, por eso se ajusta restando el offset primero)
+            if (pick.expires_at) {
+                const d = new Date(pick.expires_at);
+                const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+                document.getElementById('pickExpiresAt').value = local.toISOString().slice(0, 16);
+            } else {
+                document.getElementById('pickExpiresAt').value = '';
+            }
             document.getElementById('pickResult').value = pick.result;
             document.getElementById('pickStats').value = pick.stats;
 
@@ -864,7 +897,7 @@
 
             const { data, error } = await sbClient
                 .from('picks')
-                .select('id, section, teams, cost, is_active, created_at')
+                .select('id, section, teams, cost, is_active, expires_at, outcome, created_at')
                 .order('created_at', { ascending: false });
 
             if (error || !data) {
@@ -872,19 +905,42 @@
                 return;
             }
 
-            listEl.innerHTML = data.map(p => `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:12px; gap:6px;">
-                    <span>${p.is_active ? '🟢' : '⚪'} ${p.teams} <span style="color:var(--text-muted);">(${p.section}, ${p.cost} Cr.)</span></span>
-                    <span style="display:flex; gap:4px; flex-shrink:0;">
-                        <button class="stats-accordion-btn" style="padding:4px 8px; font-size:11px;" onclick="editPick('${p.id}')">
-                            ✏️ Editar
-                        </button>
-                        <button class="stats-accordion-btn" style="padding:4px 8px; font-size:11px;" onclick="togglePickActive('${p.id}', ${!p.is_active})">
-                            ${p.is_active ? 'Desactivar' : 'Activar'}
-                        </button>
-                    </span>
+            listEl.innerHTML = data.map(p => {
+                const expired = p.expires_at && new Date(p.expires_at) <= new Date();
+                const expiryLabel = p.expires_at
+                    ? (expired ? '⏰ Vencido' : '⏳ ' + new Date(p.expires_at).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }))
+                    : '';
+                return `
+                <div style="padding:8px; border-bottom:1px solid rgba(255,255,255,0.08); font-size:12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                        <span>${p.is_active && !expired ? '🟢' : '⚪'} ${p.teams} <span style="color:var(--text-muted);">(${p.section}, ${p.cost} Cr.)</span>${expiryLabel ? '<br><span style="color:var(--text-muted); font-size:10px;">' + expiryLabel + '</span>' : ''}</span>
+                        <span style="display:flex; gap:4px; flex-shrink:0;">
+                            <button class="stats-accordion-btn" style="padding:4px 8px; font-size:11px;" onclick="editPick('${p.id}')">
+                                ✏️ Editar
+                            </button>
+                            <button class="stats-accordion-btn" style="padding:4px 8px; font-size:11px;" onclick="togglePickActive('${p.id}', ${!p.is_active})">
+                                ${p.is_active ? 'Desactivar' : 'Activar'}
+                            </button>
+                        </span>
+                    </div>
+                    <div style="margin-top:6px; display:flex; gap:4px; align-items:center;">
+                        <span style="color:var(--text-muted); font-size:10px;">Resultado:</span>
+                        <button class="stats-accordion-btn" style="padding:3px 8px; font-size:10px; ${p.outcome === 'green' ? 'border-color: var(--neon-green); color: var(--neon-green);' : ''}" onclick="setPickOutcome('${p.id}', 'green')">✅ Ganó</button>
+                        <button class="stats-accordion-btn" style="padding:3px 8px; font-size:10px; ${p.outcome === 'red' ? 'border-color: #ff4d4d; color: #ff4d4d;' : ''}" onclick="setPickOutcome('${p.id}', 'red')">❌ Perdió</button>
+                        ${p.outcome !== 'pending' ? `<button class="stats-accordion-btn" style="padding:3px 8px; font-size:10px;" onclick="setPickOutcome('${p.id}', 'pending')">↩️ Deshacer</button>` : ''}
+                    </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
+        }
+
+        async function setPickOutcome(id, outcome) {
+            const { error } = await sbClient.from('picks').update({ outcome }).eq('id', id);
+            if (error) {
+                alert('⚠️ No se pudo actualizar el resultado: ' + error.message);
+                return;
+            }
+            renderAdminPicksList();
         }
 
         async function togglePickActive(id, newState) {
@@ -903,8 +959,67 @@
             document.getElementById('generalView').style.display = viewName === 'general' ? 'flex' : 'none';
             document.getElementById('vipView').style.display = viewName === 'vip' ? 'flex' : 'none';
             document.getElementById('adminView').style.display = viewName === 'admin' ? 'flex' : 'none';
+            document.getElementById('resultsView').style.display = viewName === 'results' ? 'flex' : 'none';
             if (viewName === 'admin') renderAdminPicksList();
+            if (viewName === 'results') loadAndRenderResults();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Trae los picks ya definidos (ganó/perdió) de los últimos días,
+        // y arma el contador de verdes/rojas + la lista.
+        async function loadAndRenderResults() {
+            const summaryEl = document.getElementById('resultsSummary');
+            const listEl = document.getElementById('resultsContainer');
+            listEl.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">Cargando...</p>';
+
+            const { data, error } = await sbClient
+                .from('picks_results')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                listEl.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">No se pudo cargar el historial.</p>';
+                return;
+            }
+
+            const results = data || [];
+            const greens = results.filter(r => r.outcome === 'green').length;
+            const reds = results.filter(r => r.outcome === 'red').length;
+            const total = greens + reds;
+            const rate = total > 0 ? Math.round((greens / total) * 100) : 0;
+
+            summaryEl.innerHTML = `
+                <div class="pick-card" style="flex:1; text-align:center; padding:12px;">
+                    <div style="font-size:20px; color: var(--neon-green);">✅ ${greens}</div>
+                    <div style="font-size:10px; color:var(--text-muted);">Verdes</div>
+                </div>
+                <div class="pick-card" style="flex:1; text-align:center; padding:12px;">
+                    <div style="font-size:20px; color:#ff4d4d;">❌ ${reds}</div>
+                    <div style="font-size:10px; color:var(--text-muted);">Rojas</div>
+                </div>
+                <div class="pick-card" style="flex:1; text-align:center; padding:12px;">
+                    <div style="font-size:20px; color: var(--neon-gold);">${rate}%</div>
+                    <div style="font-size:10px; color:var(--text-muted);">Efectividad</div>
+                </div>
+            `;
+
+            if (results.length === 0) {
+                listEl.innerHTML = '<p style="color:var(--text-muted); font-size:12px;">Todavía no hay resultados definidos.</p>';
+                return;
+            }
+
+            listEl.innerHTML = results.map(r => `
+                <div class="pick-card" style="margin-bottom:8px; border-color: ${r.outcome === 'green' ? 'var(--neon-green)' : '#ff4d4d'};">
+                    <div class="pick-header">
+                        <div class="match-info">
+                            <span class="match-meta">${r.meta} • ${new Date(r.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}</span>
+                            <span class="match-teams">${r.teams}</span>
+                        </div>
+                        <span style="font-size:18px;">${r.outcome === 'green' ? '✅' : '❌'}</span>
+                    </div>
+                    <div class="pick-result-text" style="margin-top:6px;">🎯 ${r.result}</div>
+                </div>
+            `).join('');
         }
     </script>
 </body>
