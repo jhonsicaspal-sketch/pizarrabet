@@ -439,7 +439,7 @@
                     <span class="vip-view-title">📊 Historial de Resultados</span>
                 </div>
 
-                <div id="resultsSummary" style="display:flex; gap:10px; margin-bottom:14px;"></div>
+                <div id="resultsSummary" style="display:flex; flex-direction:column; margin-bottom:14px;"></div>
 
                 <div id="resultsContainer">
                     <!-- Se inyecta por JS -->
@@ -1012,18 +1012,40 @@
             const total = greens + reds;
             const rate = total > 0 ? Math.round((greens / total) * 100) : 0;
 
+            // Desglose separado por sección, para presumir el track record VIP aparte.
+            const calcRate = (arr) => {
+                const g = arr.filter(r => r.outcome === 'green').length;
+                const r = arr.filter(r => r.outcome === 'red').length;
+                const t = g + r;
+                return { g, r, pct: t > 0 ? Math.round((g / t) * 100) : 0 };
+            };
+            const gen = calcRate(results.filter(r => r.section === 'general'));
+            const vip = calcRate(results.filter(r => r.section === 'vip'));
+
             summaryEl.innerHTML = `
-                <div class="pick-card" style="flex:1; text-align:center; padding:12px;">
-                    <div style="font-size:20px; color: var(--neon-green);">✅ ${greens}</div>
-                    <div style="font-size:10px; color:var(--text-muted);">Verdes</div>
+                <div style="display:flex; gap:10px; width:100%;">
+                    <div class="pick-card" style="flex:1; text-align:center; padding:12px;">
+                        <div style="font-size:20px; color: var(--neon-green);">✅ ${greens}</div>
+                        <div style="font-size:10px; color:var(--text-muted);">Verdes</div>
+                    </div>
+                    <div class="pick-card" style="flex:1; text-align:center; padding:12px;">
+                        <div style="font-size:20px; color:#ff4d4d;">❌ ${reds}</div>
+                        <div style="font-size:10px; color:var(--text-muted);">Rojas</div>
+                    </div>
+                    <div class="pick-card" style="flex:1; text-align:center; padding:12px;">
+                        <div style="font-size:20px; color: var(--neon-gold);">${rate}%</div>
+                        <div style="font-size:10px; color:var(--text-muted);">Efectividad</div>
+                    </div>
                 </div>
-                <div class="pick-card" style="flex:1; text-align:center; padding:12px;">
-                    <div style="font-size:20px; color:#ff4d4d;">❌ ${reds}</div>
-                    <div style="font-size:10px; color:var(--text-muted);">Rojas</div>
-                </div>
-                <div class="pick-card" style="flex:1; text-align:center; padding:12px;">
-                    <div style="font-size:20px; color: var(--neon-gold);">${rate}%</div>
-                    <div style="font-size:10px; color:var(--text-muted);">Efectividad</div>
+                <div style="display:flex; gap:10px; width:100%; margin-top:8px;">
+                    <div class="pick-card" style="flex:1; text-align:center; padding:8px; font-size:10px;">
+                        <span style="color:var(--text-main); font-weight:bold;">Feed General</span>
+                        <div style="color:var(--text-muted); margin-top:2px;">✅ ${gen.g} · ❌ ${gen.r} · ${gen.pct}%</div>
+                    </div>
+                    <div class="pick-card-vip" style="flex:1; text-align:center; padding:8px; font-size:10px;">
+                        <span style="color:var(--neon-gold); font-weight:bold;">🌟 VIP</span>
+                        <div style="color:var(--text-muted); margin-top:2px;">✅ ${vip.g} · ❌ ${vip.r} · ${vip.pct}%</div>
+                    </div>
                 </div>
             `;
 
@@ -1035,7 +1057,10 @@
             listEl.innerHTML = results.map(r => `
                 <div style="background-color: var(--card-bg); border: 1px solid ${r.outcome === 'green' ? 'var(--neon-green)' : '#ff4d4d'}; border-radius: 8px; padding: 6px 10px; margin-bottom: 5px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
                     <div style="min-width:0;">
-                        <div style="font-size:8px; color: var(--text-muted); white-space:nowrap;">${r.meta} • ${new Date(r.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}</div>
+                        <div style="font-size:8px; color: var(--text-muted); white-space:nowrap;">
+                            <span style="color:${r.section === 'vip' ? 'var(--neon-gold)' : 'var(--neon-blue)'}; font-weight:bold;">${r.section === 'vip' ? '🌟 VIP' : 'GENERAL'}</span>
+                            • ${r.meta} • ${new Date(r.created_at).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })}
+                        </div>
                         <div style="font-size:11px; font-weight:bold; color: var(--text-main);">${r.teams}</div>
                         <div style="font-size:10px; color: ${r.outcome === 'green' ? 'var(--neon-green)' : '#ff4d4d'};">🎯 ${r.result}</div>
                     </div>
